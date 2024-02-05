@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:pack_app/app/router/export.dart';
 
 class PopupDialog extends StatefulWidget {
   final String file;
@@ -18,13 +19,16 @@ class PopupDialogState extends State<PopupDialog> {
   @override
   Widget build(BuildContext context) {
     return AlertDialog(
-      title: Text(widget.file),
+      title: Text(widget.file, style: TextStyle(fontFamily: FontFamily.semiFont, fontSize: 22)),
       content: Column(
         mainAxisSize: MainAxisSize.min,
         children: [
-          const Text('Текст описания здесь'),
+          const Text(
+            'Вы можете скачать файл на устройство, для дальнейшего использования \nв отсутствии интернета',
+            style: TextStyle(fontFamily: FontFamily.regularFont, fontSize: 18),
+          ),
           Row(
-            mainAxisAlignment: MainAxisAlignment.end,
+            mainAxisAlignment: MainAxisAlignment.start,
             children: [
               Checkbox(
                 value: _hideDialog,
@@ -34,7 +38,7 @@ class PopupDialogState extends State<PopupDialog> {
                   });
                 },
               ),
-              const Text('Больше не показывать'),
+              const Text('Больше не показывать', style: TextStyle(fontFamily: FontFamily.regularFont, fontSize: 16)),
             ],
           ),
         ],

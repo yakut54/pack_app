@@ -1,5 +1,4 @@
-import 'dart:convert';
-import 'package:http/http.dart' as http;
+import 'package:dio/dio.dart';
 import '/app/router/export.dart';
 
 class PackRepo implements APackRepo {
@@ -7,10 +6,12 @@ class PackRepo implements APackRepo {
   Future<Pack> getPackWrapper() async {
     const String apiUrl = 'http://192.168.88.236/?id=2';
 
-    final response = await http.get(Uri.parse(apiUrl));
+    final response = await Dio().get(apiUrl);
+
+    final Map<String, dynamic> jsonData = response.data;
 
     if (response.statusCode == 200) {
-      return getPack(response.body);
+      return getPack(jsonData);
     } else {
       throw Exception('Failed to load pack');
     }
@@ -22,8 +23,8 @@ class PackRepo implements APackRepo {
     return getPack(response);
   }
 
-  Pack getPack(String response) {
-    final Map<String, dynamic> jsonData = jsonDecode(response);
+  Pack getPack(Map<String, dynamic> jsonData) {
+    // final Map<String, dynamic> jsonData = jsonDecode(response);
     final Map<String, dynamic> packWrapper = jsonData['packWrapper'];
     final List<dynamic> sessions = jsonData['sessionsList'];
 

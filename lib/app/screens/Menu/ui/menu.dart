@@ -32,6 +32,7 @@ class _MenuState extends State<Menu> {
   @override
   void initState() {
     super.initState();
+
     _checkConnect().then((value) => print(value));
     if (isPhone) {
       _readData();
