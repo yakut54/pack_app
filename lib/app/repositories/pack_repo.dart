@@ -1,13 +1,15 @@
+import 'dart:convert';
+
 import 'package:dio/dio.dart';
 import '/app/router/export.dart';
 
 class PackRepo implements APackRepo {
   @override
   Future<Pack> getPackWrapper() async {
-    const String apiUrl = 'http://192.168.88.236/?id=2';
+    Dio dio = Dio();
 
-    final response = await Dio().get(apiUrl);
-
+    const String apiUrl = 'http://192.168.88.236/?id=1';
+    final response = await dio.get(apiUrl);
     final Map<String, dynamic> jsonData = response.data;
 
     if (response.statusCode == 200) {
@@ -20,7 +22,8 @@ class PackRepo implements APackRepo {
   @override
   Future<Pack> getPacksFromJson(dynamic data) async {
     final response = data;
-    return getPack(response);
+    final Map<String, dynamic> jsonData = jsonDecode(response);
+    return getPack(jsonData);
   }
 
   Pack getPack(Map<String, dynamic> jsonData) {

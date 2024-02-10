@@ -15,19 +15,6 @@ class _DescriptionState extends State<Description> {
   Session get session => widget.session;
   bool fileExists = false;
 
-  @override
-  void initState() {
-    super.initState();
-    initializeDownload();
-  }
-
-  void initializeDownload() async {
-    Directory appDocDir = await getApplicationDocumentsDirectory();
-    String filePath = '${appDocDir.path}/$file';
-    fileExists = isFileExists(filePath);
-    setState(() {});
-  }
-
   String getFileName(track) {
     RegExp regex = RegExp(r'\/([^\/]+)\.(mp3|mp4)$');
     Match? match = regex.firstMatch(track);
@@ -52,7 +39,14 @@ class _DescriptionState extends State<Description> {
     return 'mp3';
   }
 
-  String get file => '${getFileName(session.track)}.${getFileExtantion(session.track)}';
+  String get fileName => '${getFileName(session.track)}.${getFileExtantion(session.track)}';
+
+  void initializeDownload() async {
+    Directory appDocDir = await getApplicationDocumentsDirectory();
+    String filePath = '${appDocDir.path}/$fileName';
+    fileExists = isFileExists(filePath);
+    setState(() {});
+  }
 
   bool isFileExists(String filePath) {
     File file = File(filePath);
@@ -60,7 +54,15 @@ class _DescriptionState extends State<Description> {
   }
 
   @override
+  void initState() {
+    super.initState();
+    initializeDownload();
+  }
+
+  @override
   Widget build(BuildContext context) {
+    print('fileExists >> $fileExists');
+
     return Scaffold(
       body: SafeArea(
         bottom: false,
@@ -157,31 +159,35 @@ class _DescriptionState extends State<Description> {
                         ),
                       ],
                     ),
-                    Positioned(
-                      right: 10,
-                      child: Container(
-                        decoration: const BoxDecoration(
-                          color: Color.fromARGB(255, 2, 52, 99),
-                          shape: BoxShape.circle,
-                        ),
-                        child: IconButton(
-                          padding: const EdgeInsets.all(0.0),
-                          iconSize: 40,
-                          icon: const Icon(
-                            Icons.download_for_offline_outlined,
+                    if (!fileExists)
+                      Positioned(
+                        right: 10,
+                        child: Container(
+                          decoration: const BoxDecoration(
+                            color: Color.fromARGB(255, 2, 52, 99),
+                            shape: BoxShape.circle,
                           ),
-                          onPressed: () {
-                            showDialog(
-                              context: context,
-                              builder: (BuildContext context) {
-                                return PopupDialog(file: file);
-                              },
-                            );
-                          },
-                          color: AppColors.mainColor,
+                          child: IconButton(
+                            padding: const EdgeInsets.all(0.0),
+                            iconSize: 40,
+                            icon: const Icon(
+                              Icons.download_for_offline_outlined,
+                            ),
+                            onPressed: () {
+                              showDialog(
+                                context: context,
+                                builder: (BuildContext context) {
+                                  return PopupDialog(
+                                    fileName: fileName,
+                                    session: session,
+                                  );
+                                },
+                              );
+                            },
+                            color: AppColors.mainColor,
+                          ),
                         ),
-                      ),
-                    )
+                      )
                   ],
                 ),
               ),

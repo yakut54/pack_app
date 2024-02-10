@@ -33,7 +33,7 @@ class _MenuState extends State<Menu> {
   void initState() {
     super.initState();
 
-    _checkConnect().then((value) => print(value));
+    _checkConnect().then((value) => print('Connect $value'));
     if (isPhone) {
       _readData();
     }

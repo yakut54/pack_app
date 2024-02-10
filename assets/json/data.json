@@ -1,83 +1,59 @@
 {
     "packWrapper": {
-        "id": "4",
-        "pack_name": "vnutrennii_doktor",
-        "title": "ВНУТРЕННИЙ ДОКТОР",
-        "subtitle": "Оздоравливающая медитация!",
-        "background_img": "bg_04"
+        "id": "1",
+        "pack_name": "blagorodnyi_gost",
+        "title": "БЛАГОРОДНЫЙ ГОСТЬ",
+        "subtitle": "Гипнотическая медитация",
+        "background_img": "bg_01"
     },
     "sessionsList": [
         {
-            "id": "9",
-            "title": "ВНУТРЕННИЙ ДОКТОР",
-            "subtitle": "Оздоравливающая медитация",
+            "id": "1",
+            "title": "СЕКРЕТ ДЛЯ НЕРЕШИТЕЛЬНЫХ",
+            "subtitle": "Аудиосеанс",
             "type": "audio",
-            "description": "Описание ВНУТРЕННИЙ ДОКТОР",
-            "session_img": "https://api.selcdn.ru/v1/SEL_53369/mng/receive/images/pack1.png",
-            "track": "https://api.selcdn.ru/v1/SEL_53369/mng/nehemicheskoe_snotvornoe.mp3",
+            "description": "Этот секрет такого свойства, что, когда его принимаешь\nкак данность, то от нерешительности не остается и следа.\nНо если не принять его во внимание, то будет как у большинства\nлюдей: своей жизнью будешь управлять не ты, а твои страхи.\nК чему такое управление приводит, известно. Картина печальная.",
+            "session_img": "https://api.selcdn.ru/v1/SEL_53369/mng/__medium__/images/best_end_day_1.png",
+            "track": "https://a1e7d4e8-08c8-47e2-a422-e6e814c27d08.selstorage.ru/_spa_zhensovet/tracks/sekret-dlya-nereshitelnyh.mp3",
             "subscribe": "Марта Николаева-Гарина,\\n гипнотерапевт",
-            "packs_id": "4",
-            "sessions_id": "7"
+            "packs_id": "1",
+            "sessions_id": "1"
         },
         {
-            "id": "14",
-            "title": "НАБОР ОТ ДЕПРЕССИИ",
-            "subtitle": "Бокс-антидепрессант",
-            "type": "audio",
-            "description": "Описание сеанса НАБОР ОТ ДЕПРЕССИИ",
-            "session_img": "https://api.selcdn.ru/v1/SEL_53369/mng/receive/images/pack2.png",
-            "track": "https://api.selcdn.ru/v1/SEL_53369/mng/motivacia_dostigenie.mp3",
-            "subscribe": "Марта Николаева-Гарина,\\n гипнотерапевт",
-            "packs_id": "4",
-            "sessions_id": "4"
-        },
-        {
-            "id": "11",
+            "id": "2",
             "title": "МОЁ ЖЕЛАНИЕ - ЗАКОН",
             "subtitle": "Видеосеанс",
             "type": "video",
             "description": "Описание сеанса МОЁ ЖЕЛАНИЕ - ЗАКОН",
-            "session_img": "https://api.selcdn.ru/v1/SEL_53369/mng/receive/images/pack3.png",
+            "session_img": "https://api.selcdn.ru/v1/SEL_53369/mng/__medium__/images/best_end_day_12.png",
             "track": "https://api.selcdn.ru/v1/SEL_53369/mng/mesto-sily.mp4",
             "subscribe": "Марта Николаева-Гарина,\\n гипнотерапевт",
-            "packs_id": "4",
+            "packs_id": "1",
             "sessions_id": "6"
         },
         {
-            "id": "12",
-            "title": "ПЕРЕКЛЮЧАТЕЛЬ",
-            "subtitle": "Сеанс коррекции состояний,\\nсубъективно воспринимаемых\\nкак внутреннее бессилие",
-            "type": "video",
-            "description": "Описание сеанса ПЕРЕКЛЮЧАТЕЛЬ",
-            "session_img": "https://api.selcdn.ru/v1/SEL_53369/mng/receive/images/pack4.png",
-            "track": "https://api.selcdn.ru/v1/SEL_53369/mng/money17sec.mp4",
+            "id": "3",
+            "title": "НЕОГРАНИЧЕННЫЕ ДОСТИЖЕНИЯ",
+            "subtitle": "Аудиосеанс",
+            "type": "audio",
+            "description": "Описание сеанса НЕОГРАНИЧЕННЫЕ ДОСТИЖЕНИЯ",
+            "session_img": "https://api.selcdn.ru/v1/SEL_53369/mng/__medium__/images/best_end_day_4.png",
+            "track": "https://api.selcdn.ru/v1/SEL_53369/mng/moya_versiya_raya.mp3",
             "subscribe": "Марта Николаева-Гарина,\\n гипнотерапевт",
-            "packs_id": "4",
-            "sessions_id": "3"
+            "packs_id": "1",
+            "sessions_id": "5"
         },
         {
-            "id": "13",
-            "title": "ГИПНОТИЧЕСКАЯ МОДЕРНИЗАЦИЯ",
-            "subtitle": "Дизайн гипнотических ресурсов",
+            "id": "4",
+            "title": "НАБОР ОТ ДЕПРЕССИИ",
+            "subtitle": "Бокс-антидепрессант",
             "type": "audio",
-            "description": "Описание сеанса ГИПНОТИЧЕСКАЯ МОДЕРНИЗАЦИЯ",
-            "session_img": "https://api.selcdn.ru/v1/SEL_53369/mng/receive/images/pack5.png",
-            "track": "https://api.selcdn.ru/v1/SEL_53369/mng/mnogomernoe_poslanie_iisusa.mp3",
+            "description": "Описание сеанса НАБОР ОТ ДЕПРЕССИИ",
+            "session_img": "https://api.selcdn.ru/v1/SEL_53369/mng/__medium__/images/best_end_day_3.png",
+            "track": "https://api.selcdn.ru/v1/SEL_53369/mng/motivacia_dostigenie.mp3",
             "subscribe": "Марта Николаева-Гарина,\\n гипнотерапевт",
-            "packs_id": "4",
-            "sessions_id": "2"
-        },
-        {
-            "id": "15",
-            "title": "КОРОБОЧКА С КНОПКАМИ",
-            "subtitle": "Сеанс-компаньон к сеансу \"Внутренний доктор\"",
-            "type": "audio",
-            "description": "«КОРОБОЧКА С КНОПКАМИ» — это естественное обезболивающее,\r\nблокирующее болевые сигналы, передаваемые мозгом. В ходе сеанса\r\nпередаётся образ прибора с функцией контроля интенсивности боли.",
-            "session_img": "https://api.selcdn.ru/v1/SEL_53369/mng/receive/images/denezhnoe_myshlenie.png",
-            "track": "https://api.selcdn.ru/v1/SEL_53369/mng/nehimicheskoe_obesbalivaushee.mp3",
-            "subscribe": "Марта Николаева-Гарина,\\n гипнотерапевт",
-            "packs_id": "4",
-            "sessions_id": "9"
+            "packs_id": "1",
+            "sessions_id": "4"
         }
     ]
 }

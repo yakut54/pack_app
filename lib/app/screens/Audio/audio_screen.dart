@@ -46,7 +46,7 @@ class _AudioScreenState extends State<AudioScreen> {
                 child: Column(
                   children: [
                     FractionallySizedBox(
-                      widthFactor: 0.7,
+                      widthFactor: 0.4,
                       child: AspectRatio(
                         aspectRatio: 1,
                         child: Container(
