@@ -1,20 +1,19 @@
 import 'dart:io';
-
-// import 'package:audioplayers/audioplayers.dart';
 import 'package:dio/dio.dart';
-import 'package:http/http.dart' as http;
 import 'package:flutter/material.dart';
-import 'package:pack_app/app/router/export.dart';
 import 'package:path_provider/path_provider.dart';
+import 'package:pack_app/app/router/export.dart';
 
 class PopupDialog extends StatefulWidget {
   final String fileName;
   final Session session;
+  final void Function() toggleParentFileExist;
 
   const PopupDialog({
     Key? key,
     required this.fileName,
     required this.session,
+    required this.toggleParentFileExist,
   }) : super(key: key);
 
   @override
@@ -23,70 +22,37 @@ class PopupDialog extends StatefulWidget {
 
 class PopupDialogState extends State<PopupDialog> {
   bool _hideDialog = false;
-  String text = 'start';
-  String path = 'path';
-  // final player = AudioPlayer();
+  bool _isLoading = false;
 
-  Future<void> downloadFile(String savePath) async {
-    var httpClient = http.Client();
-    var request = http.Request(
-        'GET', Uri.parse('https://api.selcdn.ru/v1/SEL_53369/mng/_spa_zhensovet/tracks/sekret-dlya-nereshitelnyh.mp3'));
-    var response = await httpClient.send(request);
+  void downloadFile(String savePath) async {
+    setState(() {
+      _isLoading = true;
+    });
 
-    if (response.statusCode == HttpStatus.ok) {
-      var file = File(savePath);
-      await response.stream.pipe(file.openWrite());
-      print('Файл успешно загружен');
-    } else {
-      print('Ошибка при загрузке файла');
-    }
+    Dio dio = Dio();
+    await dio.download(widget.session.track, savePath);
 
-    httpClient.close();
+    widget.toggleParentFileExist();
+    setState(() {
+      _isLoading = false;
+    });
+
+    goToBack();
   }
 
-  // void downloadFile(String savePath) async {
-  //   Dio dio = Dio();
-  //   Response response = await dio.download(widget.session.track, savePath);
-
-  //   print('response $response');
-
-  //   // try {
-  //   // print('downloadFile invoke try >> ${mounted}');
-
-  //   //   Response response = await dio.download(url, savePath);
-  //   //   // text = 'Файл успешно скачался: ${response.data}';
-
-  //   //   // if (mounted) {
-  //   //   //   // await player.play(DeviceFileSource('$path/audio.mp3'));
-  //   //   //   setState(() {});
-  //   //   // }
-  //   // } catch (e) {
-  //   //   print('downloadFile invoke catch >> ${e.toString()}');
-  //   //   // text = 'Ошибка загрузки файла: $e';
-
-  //   //   // if (mounted) {
-  //   //   //   setState(() {});
-  //   //   // }
-  //   // }
-  // }
+  goToBack() {
+    Navigator.of(context).pop();
+  }
 
   Future<String> getPath() async {
     Directory appDocDir = await getApplicationDocumentsDirectory();
-    path = appDocDir.path;
     setState(() {});
     return '${appDocDir.path}/${widget.fileName}';
   }
 
   void initializeDownload() async {
     String path = await getPath(); // /path/name.ext
-    print('path >> $path');
     downloadFile(path);
-  }
-
-  @override
-  void initState() {
-    super.initState();
-    // initializeDownload();
   }
 
   @override
@@ -116,42 +82,70 @@ class PopupDialogState extends State<PopupDialog> {
       ),
       content: Column(
         mainAxisSize: MainAxisSize.min,
-        children: [
-          const Text(
-            'Вы можете скачать файл на устройство, для дальнейшего использования \nв отсутствии интернета',
-            style: TextStyle(fontFamily: FontFamily.regularFont, fontSize: 18),
-          ),
-          Row(
-            mainAxisAlignment: MainAxisAlignment.start,
-            children: [
-              Checkbox(
-                value: _hideDialog,
-                onChanged: (value) {
-                  setState(() {
-                    _hideDialog = value ?? false;
-                  });
-                },
-              ),
-              const Text('Больше не показывать', style: TextStyle(fontFamily: FontFamily.regularFont, fontSize: 16)),
-            ],
-          ),
-        ],
+        children: _isLoading
+            ? [
+                const Text('...Загрузка', style: TextStyle(fontFamily: FontFamily.semiFont, fontSize: 22)),
+                const SizedBox(height: 20),
+                const CircularProgressIndicator(),
+                const SizedBox(height: 20),
+                const Text(
+                  'Подождите, пока файл сохранится \nна Ваше устройство',
+                  style: TextStyle(fontFamily: FontFamily.semiFont, fontSize: 20),
+                  textAlign: TextAlign.center,
+                ),
+              ]
+            : [
+                const Text(
+                  'Вы можете скачать файл на устройство, для дальнейшего использования \nв отсутствии интернета',
+                  style: TextStyle(fontFamily: FontFamily.regularFont, fontSize: 18),
+                ),
+                Row(mainAxisAlignment: MainAxisAlignment.start, children: [
+                  Checkbox(
+                    value: _hideDialog,
+                    onChanged: (value) {
+                      setState(() {
+                        _hideDialog = value ?? false;
+                      });
+                    },
+                  ),
+                  const Text(
+                    'Больше не показывать',
+                    style: TextStyle(
+                      fontFamily: FontFamily.regularFont,
+                      fontSize: 16,
+                    ),
+                  ),
+                ]),
+              ],
       ),
-      actions: [
-        ElevatedButton(
-          onPressed: () {
-            initializeDownload();
-            Navigator.of(context).pop();
-          },
-          child: const Text("Сохранить"),
-        ),
-        ElevatedButton(
-          onPressed: () {
-            Navigator.of(context).pop();
-          },
-          child: const Text("Отмена"),
-        ),
-      ],
+      actions: _isLoading
+          ? []
+          : [
+              ElevatedButton(
+                onPressed: () {
+                  initializeDownload();
+                },
+                child: const Text(
+                  "Сохранить",
+                  style: TextStyle(
+                    fontFamily: FontFamily.regularFont,
+                    fontSize: 22,
+                  ),
+                ),
+              ),
+              ElevatedButton(
+                onPressed: () {
+                  Navigator.of(context).pop();
+                },
+                child: const Text(
+                  "Отмена",
+                  style: TextStyle(
+                    fontFamily: FontFamily.regularFont,
+                    fontSize: 22,
+                  ),
+                ),
+              ),
+            ],
     );
   }
 }

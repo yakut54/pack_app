@@ -14,6 +14,13 @@ class Description extends StatefulWidget {
 class _DescriptionState extends State<Description> {
   Session get session => widget.session;
   bool fileExists = false;
+  bool isBarrierDismissible = true;
+
+  void toggleFileExist() {
+    setState(() {
+      fileExists = true;
+    });
+  }
 
   String getFileName(track) {
     RegExp regex = RegExp(r'\/([^\/]+)\.(mp3|mp4)$');
@@ -41,7 +48,7 @@ class _DescriptionState extends State<Description> {
 
   String get fileName => '${getFileName(session.track)}.${getFileExtantion(session.track)}';
 
-  void initializeDownload() async {
+  void init() async {
     Directory appDocDir = await getApplicationDocumentsDirectory();
     String filePath = '${appDocDir.path}/$fileName';
     fileExists = isFileExists(filePath);
@@ -56,12 +63,12 @@ class _DescriptionState extends State<Description> {
   @override
   void initState() {
     super.initState();
-    initializeDownload();
+    init();
   }
 
   @override
   Widget build(BuildContext context) {
-    print('fileExists >> $fileExists');
+    print('description.dart fileExists >> $fileExists');
 
     return Scaffold(
       body: SafeArea(
@@ -175,11 +182,13 @@ class _DescriptionState extends State<Description> {
                             ),
                             onPressed: () {
                               showDialog(
+                                barrierDismissible: false,
                                 context: context,
                                 builder: (BuildContext context) {
                                   return PopupDialog(
                                     fileName: fileName,
                                     session: session,
+                                    toggleParentFileExist: toggleFileExist,
                                   );
                                 },
                               );
@@ -187,7 +196,7 @@ class _DescriptionState extends State<Description> {
                             color: AppColors.mainColor,
                           ),
                         ),
-                      )
+                      ),
                   ],
                 ),
               ),

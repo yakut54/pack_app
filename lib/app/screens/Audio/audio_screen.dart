@@ -76,7 +76,10 @@ class _AudioScreenState extends State<AudioScreen> {
                           width: MediaQuery.of(context).size.width * 1.0,
                           color: Colors.white.withOpacity(0.8),
                           padding: const EdgeInsets.all(8.0),
-                          child: Player(player: player, session: widget.session),
+                          child: Player(
+                            player: player,
+                            session: widget.session,
+                          ),
                         )
                       ],
                     ),
