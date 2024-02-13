@@ -1,7 +1,4 @@
-import 'dart:io';
-import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
-import 'package:path_provider/path_provider.dart';
 import 'package:pack_app/app/router/export.dart';
 import 'package:provider/provider.dart';
 
@@ -9,14 +6,12 @@ class PopupDialog extends StatefulWidget {
   final String fileName;
   final Session session;
   final void Function() toggleParentFileExist;
-  final void Function(bool) toggleIsNotVisible;
 
   const PopupDialog({
     Key? key,
     required this.fileName,
     required this.session,
     required this.toggleParentFileExist,
-    required this.toggleIsNotVisible,
   }) : super(key: key);
 
   @override
@@ -24,43 +19,11 @@ class PopupDialog extends StatefulWidget {
 }
 
 class PopupDialogState extends State<PopupDialog> {
-  bool _hideDialog = false;
-  bool _isLoading = false;
+  void initDownload() {}
 
-  void downloadFile(String savePath) async {
-    setState(() {
-      _isLoading = true;
-    });
-
-    Dio dio = Dio();
-    await dio.download(widget.session.track, savePath);
-
-    widget.toggleParentFileExist();
-    setState(() {
-      _isLoading = false;
-    });
-
-    goToBack();
-  }
-
-  void goToBack() {
-    Navigator.of(context).pop();
-  }
-
-  Future<String> getPath() async {
-    Directory appDocDir = await getApplicationDocumentsDirectory();
-    setState(() {});
-    return '${appDocDir.path}/${widget.fileName}';
-  }
-
-  void initializeDownload() async {
-    String path = await getPath(); // /path/name.ext
-    downloadFile(path);
-  }
-
-  void Function(bool?)? onChanged(value) {
-    widget.toggleIsNotVisible(value);
-    return null;
+  @override
+  void initState() {
+    super.initState();
   }
 
   @override
@@ -90,76 +53,60 @@ class PopupDialogState extends State<PopupDialog> {
       ),
       content: Column(
         mainAxisSize: MainAxisSize.min,
-        children: _isLoading
-            ? [
-                const Text('...Загрузка', style: TextStyle(fontFamily: FontFamily.semiFont, fontSize: 22)),
-                const SizedBox(height: 20),
-                const CircularProgressIndicator(),
-                const SizedBox(height: 20),
-                const Text(
-                  'Подождите, пока файл сохранится \nна Ваше устройство',
-                  style: TextStyle(fontFamily: FontFamily.semiFont, fontSize: 20),
-                  textAlign: TextAlign.center,
-                ),
-              ]
-            : [
-                const Text(
-                  'Вы можете скачать файл на устройство, для дальнейшего использования \nв отсутствии интернета',
-                  style: TextStyle(fontFamily: FontFamily.regularFont, fontSize: 18),
-                ),
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.start,
-                  children: [
-                    Checkbox(
-                      value: _hideDialog,
-                      onChanged: (value) async {
-                        setState(() {
-                          _hideDialog = value ?? false;
-                        });
-                        context.read<DownloadFile>().toggleIsLoading(value);
-                        String a = await context.read<DownloadFile>().asyncTest();
-                        print(a);
-                      },
-                    ),
-                    Text(
-                      'Test ${context.read<DownloadFile>().isLoading.toString()}',
-                      style: const TextStyle(
-                        fontFamily: FontFamily.regularFont,
-                        fontSize: 16,
-                      ),
-                    ),
-                  ],
-                ),
-              ],
-      ),
-      actions: _isLoading
-          ? []
-          : [
-              ElevatedButton(
-                onPressed: () {
-                  initializeDownload();
+        children: [
+          const Text(
+            'Вы можете скачать файл на устройство, для дальнейшего использования \nв отсутствии интернета',
+            style: TextStyle(fontFamily: FontFamily.regularFont, fontSize: 18),
+          ),
+          Row(
+            mainAxisAlignment: MainAxisAlignment.start,
+            children: [
+              Checkbox(
+                value: context.read<DownloadFile>().isLoading,
+                onChanged: (value) async {
+                  setState(() {
+                    context.read<DownloadFile>().isLoading = value ?? false;
+                  });
+                  // context.read<DownloadFile>().toggleIsLoading(value);
                 },
-                child: const Text(
-                  "Сохранить",
-                  style: TextStyle(
-                    fontFamily: FontFamily.regularFont,
-                    fontSize: 22,
-                  ),
-                ),
               ),
-              ElevatedButton(
-                onPressed: () {
-                  Navigator.of(context).pop();
-                },
-                child: const Text(
-                  "Отмена",
-                  style: TextStyle(
-                    fontFamily: FontFamily.regularFont,
-                    fontSize: 22,
-                  ),
+              const Text(
+                'Больше не показывать',
+                style: TextStyle(
+                  fontFamily: FontFamily.regularFont,
+                  fontSize: 16,
                 ),
               ),
             ],
+          ),
+        ],
+      ),
+      actions: [
+        ElevatedButton(
+          onPressed: () {
+            initDownload();
+          },
+          child: const Text(
+            "Сохранить",
+            style: TextStyle(
+              fontFamily: FontFamily.regularFont,
+              fontSize: 22,
+            ),
+          ),
+        ),
+        ElevatedButton(
+          onPressed: () {
+            Navigator.of(context).pop();
+          },
+          child: const Text(
+            "Отмена",
+            style: TextStyle(
+              fontFamily: FontFamily.regularFont,
+              fontSize: 22,
+            ),
+          ),
+        ),
+      ],
     );
   }
 }

@@ -1,25 +1,48 @@
-import 'dart:async';
 import 'dart:io';
 
 import 'package:flutter/material.dart';
-import 'package:path_provider/path_provider.dart';
 
 class DownloadFile extends ChangeNotifier {
   bool isLoading = false;
 
-  void toggleIsLoading(boolean) {
+  void toggleIsLoading(bool boolean) {
     isLoading = boolean;
     notifyListeners();
   }
 
-  Future<String> asyncTest() async {
-    Timer(Duration(milliseconds: 500), () {
-      print('Функция setTimeout выполнена');
-    });
+  String getFileName(String track) {
+    RegExp regex = RegExp(r'\/([^\/]+)\.(mp3|mp4)$');
+    Match? match = regex.firstMatch(track);
 
-    Directory appDocDir = await getApplicationDocumentsDirectory();
+    if (match != null) {
+      String fileName = match.group(1)!;
+      return fileName;
+    }
 
-    print(appDocDir);
-    return appDocDir.toString();
+    return 'file_name';
+  }
+
+  String getFileExtantion(String track) {
+    RegExp regex = RegExp(r'\.([a-zA-Z0-9]+)$');
+    Match? match = regex.firstMatch(track);
+
+    if (match != null) {
+      String extantion = match.group(1)!;
+      return extantion;
+    }
+
+    return 'mp3';
+  }
+
+  String getFileExt(String track) {
+    return '${getFileName(track)}.${getFileExtantion(track)}';
+  }
+
+  bool isFileExists(String filePath) {
+    File file = File(filePath);
+    return file.existsSync();
   }
 }
+
+
+// context.read<DownloadFile>().isLoading.toString()
