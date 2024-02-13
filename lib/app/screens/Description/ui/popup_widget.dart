@@ -3,6 +3,7 @@ import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:pack_app/app/router/export.dart';
+import 'package:provider/provider.dart';
 
 class PopupDialog extends StatefulWidget {
   final String fileName;
@@ -106,24 +107,29 @@ class PopupDialogState extends State<PopupDialog> {
                   'Вы можете скачать файл на устройство, для дальнейшего использования \nв отсутствии интернета',
                   style: TextStyle(fontFamily: FontFamily.regularFont, fontSize: 18),
                 ),
-                Row(mainAxisAlignment: MainAxisAlignment.start, children: [
-                  Checkbox(
-                    value: _hideDialog,
-                    onChanged: (value) {
-                      setState(() {
-                        _hideDialog = value ?? false;
-                      });
-                      onChanged(value);
-                    },
-                  ),
-                  const Text(
-                    'Больше не показывать',
-                    style: TextStyle(
-                      fontFamily: FontFamily.regularFont,
-                      fontSize: 16,
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.start,
+                  children: [
+                    Checkbox(
+                      value: _hideDialog,
+                      onChanged: (value) async {
+                        setState(() {
+                          _hideDialog = value ?? false;
+                        });
+                        context.read<DownloadFile>().toggleIsLoading(value);
+                        String a = await context.read<DownloadFile>().asyncTest();
+                        print(a);
+                      },
                     ),
-                  ),
-                ]),
+                    Text(
+                      'Test ${context.read<DownloadFile>().isLoading.toString()}',
+                      style: const TextStyle(
+                        fontFamily: FontFamily.regularFont,
+                        fontSize: 16,
+                      ),
+                    ),
+                  ],
+                ),
               ],
       ),
       actions: _isLoading
