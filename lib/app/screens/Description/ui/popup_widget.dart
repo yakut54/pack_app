@@ -8,12 +8,14 @@ class PopupDialog extends StatefulWidget {
   final String fileName;
   final Session session;
   final void Function() toggleParentFileExist;
+  final void Function(bool) toggleIsNotVisible;
 
   const PopupDialog({
     Key? key,
     required this.fileName,
     required this.session,
     required this.toggleParentFileExist,
+    required this.toggleIsNotVisible,
   }) : super(key: key);
 
   @override
@@ -40,7 +42,7 @@ class PopupDialogState extends State<PopupDialog> {
     goToBack();
   }
 
-  goToBack() {
+  void goToBack() {
     Navigator.of(context).pop();
   }
 
@@ -53,6 +55,11 @@ class PopupDialogState extends State<PopupDialog> {
   void initializeDownload() async {
     String path = await getPath(); // /path/name.ext
     downloadFile(path);
+  }
+
+  void Function(bool?)? onChanged(value) {
+    widget.toggleIsNotVisible(value);
+    return null;
   }
 
   @override
@@ -106,6 +113,7 @@ class PopupDialogState extends State<PopupDialog> {
                       setState(() {
                         _hideDialog = value ?? false;
                       });
+                      onChanged(value);
                     },
                   ),
                   const Text(

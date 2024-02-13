@@ -4,5 +4,8 @@ import '/app/router/export.dart';
 
 void main() {
   GetIt.I.registerLazySingleton<APackRepo>(() => PackRepo());
-  runApp(const App());
+  WidgetsFlutterBinding.ensureInitialized();
+  runApp(
+    const App(),
+  );
 }
