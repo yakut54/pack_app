@@ -1,4 +1,5 @@
 import 'dart:io';
+import 'package:hive/hive.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:flutter/material.dart';
 import '/app/router/export.dart';
@@ -14,12 +15,26 @@ class Description extends StatefulWidget {
 class _DescriptionState extends State<Description> {
   Session get session => widget.session;
   bool fileExists = false;
-  bool isBarrierDismissible = true;
+  bool isNotVisible = false;
+
+  Future<Directory> appDocumentDir() async => await getApplicationDocumentsDirectory();
+
+  Future<Box<dynamic>> getBox() async {
+    Directory appDocDir = await appDocumentDir();
+    Hive.init(appDocDir.path);
+    Box<dynamic> box = await Hive.openBox('visible');
+    return box;
+  }
 
   void toggleFileExist() {
     setState(() {
       fileExists = true;
     });
+  }
+
+  bool isFileExists(String filePath) {
+    File file = File(filePath);
+    return file.existsSync();
   }
 
   String getFileName(track) {
@@ -49,26 +64,45 @@ class _DescriptionState extends State<Description> {
   String get fileName => '${getFileName(session.track)}.${getFileExtantion(session.track)}';
 
   void init() async {
-    Directory appDocDir = await getApplicationDocumentsDirectory();
+    Directory appDocDir = await appDocumentDir();
     String filePath = '${appDocDir.path}/$fileName';
     fileExists = isFileExists(filePath);
     setState(() {});
   }
 
-  bool isFileExists(String filePath) {
-    File file = File(filePath);
-    return file.existsSync();
+  void initHive() async {
+    var box = await getBox();
+
+    setState(() {
+      isNotVisible = box.get('isNotVisible', defaultValue: false);
+      print('initHive init $isNotVisible setState after');
+    });
+
+    await box.close();
+  }
+
+  void toggleIsNotVisible(boolean) async {
+    var box = await getBox();
+
+    print('Проверка связи!');
+    isNotVisible = boolean;
+    await box.put('isNotVisible', boolean);
+    setState(() {});
+    print('Проверка связи! isNotVisible $isNotVisible');
+
+    await box.close();
   }
 
   @override
   void initState() {
     super.initState();
     init();
+    initHive();
   }
 
   @override
   Widget build(BuildContext context) {
-    print('description.dart fileExists >> $fileExists');
+    print('!fileExists && !isNotVisible 1 ${!fileExists && !isNotVisible}');
 
     return Scaffold(
       body: SafeArea(
@@ -166,7 +200,7 @@ class _DescriptionState extends State<Description> {
                         ),
                       ],
                     ),
-                    if (!fileExists)
+                    if (!fileExists && !isNotVisible)
                       Positioned(
                         right: 10,
                         child: Container(
@@ -186,17 +220,38 @@ class _DescriptionState extends State<Description> {
                                 context: context,
                                 builder: (BuildContext context) {
                                   return PopupDialog(
-                                    fileName: fileName,
-                                    session: session,
-                                    toggleParentFileExist: toggleFileExist,
-                                  );
+                                      fileName: fileName,
+                                      session: session,
+                                      toggleParentFileExist: toggleFileExist,
+                                      toggleIsNotVisible: toggleIsNotVisible);
                                 },
                               );
                             },
                             color: AppColors.mainColor,
                           ),
                         ),
-                      ),
+                      )
+                    else if (!fileExists)
+                      Positioned(
+                        right: 10,
+                        child: Container(
+                          decoration: const BoxDecoration(
+                            color: Color.fromARGB(255, 2, 52, 99),
+                            shape: BoxShape.circle,
+                          ),
+                          child: IconButton(
+                            padding: const EdgeInsets.all(0.0),
+                            iconSize: 40,
+                            icon: const Icon(
+                              Icons.download_for_offline_outlined,
+                            ),
+                            onPressed: () {
+                              print('object');
+                            },
+                            color: AppColors.mainColor,
+                          ),
+                        ),
+                      )
                   ],
                 ),
               ),
