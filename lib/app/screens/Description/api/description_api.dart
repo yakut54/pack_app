@@ -2,10 +2,10 @@ import 'package:flutter/material.dart';
 import '/app/router/export.dart';
 
 class DescriptionApi extends ChangeNotifier {
-  bool isBarrierDismiss = false;
+  bool isLoading = false;
 
-  void toggleIsBarrierDismiss(bool boolean) {
-    isBarrierDismiss = boolean;
+  void toggleIsLoading(bool boolean) {
+    isLoading = boolean;
     notifyListeners();
   }
 

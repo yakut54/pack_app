@@ -26,20 +26,20 @@ class _DescriptionState extends State<Description> {
   }
 
   void checkFileExists() async {
-    filePath = await DownloadFile().getFilePath(widget.session.track); // name.ext
-    fileExists = DownloadFile().isFileExists(filePath); // Проверяем наличие файла
+    filePath = await DownloadFileApi().getFilePath(widget.session.track); // name.ext
+    fileExists = DownloadFileApi().isFileExists(filePath); // Проверяем наличие файла
     setState(() {});
   }
 
   /* Значение checkbox записываем в localstorage */
 
-  // late bool isNotVisible; // Чекбокс "Больше не показывать"
   late Box<dynamic> box; // Have box
 
   void initHive() async {
-    DownloadFile desc = context.read<DownloadFile>();
+    DownloadFileApi desc = context.read<DownloadFileApi>();
     box = await HiveBoxVisible().getBox();
     desc.toggleIsNotVisible(box.get('isNotVisible', defaultValue: false));
+    print('init have ${box.get('isNotVisible', defaultValue: false)}');
     setState(() {});
     await box.close();
   }
@@ -48,7 +48,7 @@ class _DescriptionState extends State<Description> {
   @override
   void initState() {
     super.initState();
-    print('start');
+    checkFileExists();
     initHive();
   }
 
@@ -86,19 +86,18 @@ class _DescriptionState extends State<Description> {
                       right: 10,
                       child: Container(
                         decoration: const BoxDecoration(
-                          color: Color.fromARGB(255, 2, 52, 99),
+                          color: Color.fromARGB(255, 17, 73, 3),
                           shape: BoxShape.circle,
                         ),
                         child: IconButton(
                           padding: const EdgeInsets.all(0.0),
-                          iconSize: 40,
+                          iconSize: 50,
                           icon: const Icon(
                             Icons.download_for_offline_outlined,
                           ),
                           onPressed: () {
-                            checkFileExists();
                             showDialog(
-                              barrierDismissible: !context.read<DownloadFile>().isLoading,
+                              barrierDismissible: !context.read<DescriptionApi>().isLoading,
                               context: context,
                               builder: (context) {
                                 return PopupDialog(

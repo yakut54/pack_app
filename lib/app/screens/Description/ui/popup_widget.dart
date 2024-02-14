@@ -18,10 +18,8 @@ class PopupDialog extends StatefulWidget {
 }
 
 class PopupDialogState extends State<PopupDialog> {
-  bool _hideDialog = false;
-
   void initDownload() {
-    context.read<DownloadFile>().toggleIsLoading(true);
+    context.read<DescriptionApi>().toggleIsLoading(true);
   }
 
   // Checkbox off/on
@@ -40,73 +38,14 @@ class PopupDialogState extends State<PopupDialog> {
 
   @override
   Widget build(BuildContext context) {
-    DownloadFile ctxWD = context.watch<DownloadFile>();
-    DownloadFile ctxRD = context.read<DownloadFile>();
+    DownloadFileApi ctxWD = context.watch<DownloadFileApi>();
 
     return AlertDialog(
-      contentPadding: const EdgeInsets.only(top: 10, right: 16, bottom: 10, left: 6),
+      contentPadding: const EdgeInsets.only(top: 10, right: 16, bottom: 6, left: 6),
       insetPadding: const EdgeInsets.all(8),
-      title: Row(
-        children: [
-          SizedBox(
-            width: 60,
-            child: Image.asset(
-              'assets/images/__${widget.session.type}__.png',
-            ),
-          ),
-          const SizedBox(width: 8),
-          Expanded(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(
-                  ctxWD.getTypeFile(widget.session.type),
-                  style: const TextStyle(fontFamily: FontFamily.semiFont, fontSize: 22),
-                ),
-                Text(
-                  ctxWD.getFileNameExtention(widget.session.track),
-                  style: const TextStyle(fontFamily: FontFamily.semiFont, fontSize: 22),
-                ),
-              ],
-            ),
-          ),
-        ],
-      ),
-      content: Column(
-        mainAxisSize: MainAxisSize.min,
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          const Padding(
-            padding: EdgeInsets.only(left: 16),
-            child: Text(
-              'Вы можете скачать файл \n'
-              'на устройство, для дальнейшего\n'
-              'использования в отсутствии интернета',
-              style: TextStyle(fontFamily: FontFamily.regularFont, fontSize: 19),
-            ),
-          ),
-          Row(
-            mainAxisAlignment: MainAxisAlignment.start,
-            children: [
-              Checkbox(
-                value: context.read<DownloadFile>().isLoading,
-                onChanged: (value) {
-                  _hideDialog = value ?? false;
-                  setState(() {});
-                  ctxRD.toggleIsLoading(_hideDialog);
-                  toggleButtonCallDialodVisible(_hideDialog);
-                },
-              ),
-              const Text(
-                'Больше не показывать',
-                style: TextStyle(
-                  fontFamily: FontFamily.regularFont,
-                  fontSize: 16,
-                ),
-              ),
-            ],
-          ),
-        ],
+      title: AlertDialogTitleWidget(widget: widget, ctxWD: ctxWD),
+      content: AlertDialogContentWidget(
+        toggleButtonCallDialodVisible: toggleButtonCallDialodVisible,
       ),
       actions: [
         ElevatedButton(
@@ -132,6 +71,93 @@ class PopupDialogState extends State<PopupDialog> {
               fontSize: 22,
             ),
           ),
+        ),
+      ],
+    );
+  }
+}
+
+class AlertDialogTitleWidget extends StatelessWidget {
+  const AlertDialogTitleWidget({
+    super.key,
+    required this.widget,
+    required this.ctxWD,
+  });
+
+  final PopupDialog widget;
+  final DownloadFileApi ctxWD;
+
+  @override
+  Widget build(BuildContext context) {
+    return Row(
+      children: [
+        SizedBox(
+          width: 60,
+          child: Image.asset(
+            'assets/images/__${widget.session.type}__.png',
+          ),
+        ),
+        const SizedBox(width: 8),
+        Expanded(
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text(
+                ctxWD.getTypeFile(widget.session.type),
+                style: const TextStyle(fontFamily: FontFamily.semiFont, fontSize: 22),
+              ),
+              Text(
+                ctxWD.getFileNameExtention(widget.session.track),
+                style: const TextStyle(fontFamily: FontFamily.semiFont, fontSize: 22),
+              ),
+            ],
+          ),
+        ),
+      ],
+    );
+  }
+}
+
+class AlertDialogContentWidget extends StatelessWidget {
+  final void Function(bool)? toggleButtonCallDialodVisible;
+
+  const AlertDialogContentWidget({
+    super.key,
+    required this.toggleButtonCallDialodVisible,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return Column(
+      mainAxisSize: MainAxisSize.min,
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        const Padding(
+          padding: EdgeInsets.only(left: 16),
+          child: Text(
+            'Вы можете скачать файл \n'
+            'на устройство, для дальнейшего\n'
+            'использования в отсутствии интернета',
+            style: TextStyle(fontFamily: FontFamily.regularFont, fontSize: 19),
+          ),
+        ),
+        Row(
+          mainAxisAlignment: MainAxisAlignment.start,
+          children: [
+            Checkbox(
+              value: context.watch<DescriptionApi>().isNotVisible,
+              onChanged: (bool? value) {
+                toggleButtonCallDialodVisible!(value!);
+              },
+            ),
+            const Text(
+              'Больше не показывать',
+              style: TextStyle(
+                fontFamily: FontFamily.regularFont,
+                fontSize: 16,
+              ),
+            ),
+          ],
         ),
       ],
     );

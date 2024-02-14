@@ -1,15 +1,7 @@
 import 'dart:io';
-import 'app_document_dir.dart';
-import 'description_api.dart';
+import '/app/router/export.dart';
 
 class DownloadFileApi extends DescriptionApi {
-  bool isLoading = false;
-
-  void toggleIsLoading(bool boolean) {
-    isLoading = boolean;
-    notifyListeners();
-  }
-
   String getFileName(String track) {
     RegExp regex = RegExp(r'\/([^\/]+)\.(mp3|mp4)$');
     Match? match = regex.firstMatch(track);
@@ -38,10 +30,6 @@ class DownloadFileApi extends DescriptionApi {
     return '${getFileName(track)}.${getFileExtention(track)}';
   }
 
-  String getTypeFile(type) {
-    return type == 'audio' ? 'Аудиофайл' : 'Видеофайл';
-  }
-
   Future<String> getFilePath(String track) async {
     Directory appDocDir = await appDocumentDir(); // Создаём дирректорию для сохранения файлов
     return '${appDocDir.path}/${getFileName(track)}.${getFileExtention(track)}';
@@ -51,4 +39,6 @@ class DownloadFileApi extends DescriptionApi {
     File file = File(filePath);
     return file.existsSync();
   }
+
+  String getTypeFile(type) => type == 'audio' ? 'Аудиофайл' : 'Видеофайл';
 }
