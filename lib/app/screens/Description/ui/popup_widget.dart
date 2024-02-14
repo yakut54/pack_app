@@ -5,12 +5,10 @@ import 'package:provider/provider.dart';
 
 class PopupDialog extends StatefulWidget {
   final Session session;
-  final void Function() toggleParentFileExist;
 
   const PopupDialog({
     Key? key,
     required this.session,
-    required this.toggleParentFileExist,
   }) : super(key: key);
 
   @override
@@ -40,39 +38,52 @@ class PopupDialogState extends State<PopupDialog> {
   Widget build(BuildContext context) {
     DownloadFileApi ctxWD = context.watch<DownloadFileApi>();
 
-    return AlertDialog(
-      contentPadding: const EdgeInsets.only(top: 10, right: 16, bottom: 6, left: 6),
-      insetPadding: const EdgeInsets.all(8),
-      title: AlertDialogTitleWidget(widget: widget, ctxWD: ctxWD),
-      content: AlertDialogContentWidget(
-        toggleButtonCallDialodVisible: toggleButtonCallDialodVisible,
+    return Container(
+      color: AppColors.overlayColor,
+      width: MediaQuery.of(context).size.width,
+      child: AlertDialog(
+        backgroundColor: AppColors.mediumColor,
+        contentPadding: const EdgeInsets.only(top: 10, right: 16, bottom: 6, left: 6),
+        insetPadding: const EdgeInsets.all(8),
+        title: AlertDialogTitleWidget(widget: widget, ctxWD: ctxWD),
+        content: Builder(
+          builder: (context) {
+            var width = MediaQuery.of(context).size.width;
+            return SizedBox(
+                width: width - 50,
+                child: !ctxWD.fileExists
+                    ? AlertDialogContentWidget(toggleButtonCallDialodVisible: toggleButtonCallDialodVisible)
+                    : const AlertDialogDownloadFileWidget());
+          },
+        ),
+        actions: [
+          ElevatedButton(
+            onPressed: () {
+              initDownload();
+            },
+            child: const Text(
+              "Сохранить",
+              style: TextStyle(
+                fontFamily: FontFamily.regularFont,
+                fontSize: 22,
+              ),
+            ),
+          ),
+          ElevatedButton(
+            onPressed: () {
+              ctxWD.toggleIsFileExist(!ctxWD.fileExists);
+              // Navigator.of(context).pop();
+            },
+            child: const Text(
+              "Отмена",
+              style: TextStyle(
+                fontFamily: FontFamily.regularFont,
+                fontSize: 22,
+              ),
+            ),
+          ),
+        ],
       ),
-      actions: [
-        ElevatedButton(
-          onPressed: () {
-            initDownload();
-          },
-          child: const Text(
-            "Сохранить",
-            style: TextStyle(
-              fontFamily: FontFamily.regularFont,
-              fontSize: 22,
-            ),
-          ),
-        ),
-        ElevatedButton(
-          onPressed: () {
-            Navigator.of(context).pop();
-          },
-          child: const Text(
-            "Отмена",
-            style: TextStyle(
-              fontFamily: FontFamily.regularFont,
-              fontSize: 22,
-            ),
-          ),
-        ),
-      ],
     );
   }
 }
@@ -159,6 +170,21 @@ class AlertDialogContentWidget extends StatelessWidget {
             ),
           ],
         ),
+      ],
+    );
+  }
+}
+
+class AlertDialogDownloadFileWidget extends StatelessWidget {
+  const AlertDialogDownloadFileWidget({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    return const Column(
+      mainAxisSize: MainAxisSize.min,
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Text('Начинаем загрузку'),
       ],
     );
   }

@@ -16,7 +16,7 @@ class DescriptionApi extends ChangeNotifier {
     notifyListeners();
   }
 
-  Widget controllerRouteWidget(Session session) {
+  Widget getScreenWidgetBySessionType(Session session) {
     if (session.type == 'audio') {
       return AudioScreen(session: session);
     } else {

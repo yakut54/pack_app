@@ -17,18 +17,11 @@ class _DescriptionState extends State<Description> {
   /* Определяем наличие файла */
 
   late String filePath; // path/audio.mp3
-  bool fileExists = false; // Наличие файла
 
-  void toggleIsFileExist() {
-    setState(() {
-      fileExists = true;
-    });
-  }
-
-  void checkFileExists() async {
+  void toggleFileExists() async {
     filePath = await DownloadFileApi().getFilePath(widget.session.track); // name.ext
-    fileExists = DownloadFileApi().isFileExists(filePath); // Проверяем наличие файла
     setState(() {});
+    DownloadFileApi().isFileExists(filePath); // Проверяем наличие файла
   }
 
   /* Значение checkbox записываем в localstorage */
@@ -48,7 +41,7 @@ class _DescriptionState extends State<Description> {
   @override
   void initState() {
     super.initState();
-    checkFileExists();
+    toggleFileExists();
     initHive();
   }
 
@@ -100,10 +93,7 @@ class _DescriptionState extends State<Description> {
                               barrierDismissible: !context.read<DescriptionApi>().isLoading,
                               context: context,
                               builder: (context) {
-                                return PopupDialog(
-                                  session: session,
-                                  toggleParentFileExist: toggleIsFileExist,
-                                );
+                                return PopupDialog(session: session);
                               },
                             );
                           },
@@ -112,7 +102,7 @@ class _DescriptionState extends State<Description> {
                       ),
                     ),
                     Text(
-                      '${context.watch<DescriptionApi>().isNotVisible}',
+                      '${context.watch<DownloadFileApi>().fileExists}',
                       style: const TextStyle(fontSize: 34, color: AppColors.btnColor),
                     )
                   ],
@@ -165,7 +155,7 @@ class GradientButtonWidget extends StatelessWidget {
           context,
           MaterialPageRoute(
             builder: (context) {
-              return DescriptionApi().controllerRouteWidget(session);
+              return DescriptionApi().getScreenWidgetBySessionType(session);
             },
           ),
         );

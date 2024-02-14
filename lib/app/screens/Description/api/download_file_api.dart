@@ -3,13 +3,6 @@ import 'app_document_dir.dart';
 import 'description_api.dart';
 
 class DownloadFileApi extends DescriptionApi {
-  bool isLoading = false;
-
-  void toggleIsLoading(bool boolean) {
-    isLoading = boolean;
-    notifyListeners();
-  }
-
   String getFileName(String track) {
     RegExp regex = RegExp(r'\/([^\/]+)\.(mp3|mp4)$');
     Match? match = regex.firstMatch(track);
@@ -47,8 +40,16 @@ class DownloadFileApi extends DescriptionApi {
     return '${appDocDir.path}/${getFileName(track)}.${getFileExtention(track)}';
   }
 
-  bool isFileExists(String filePath) {
+  void isFileExists(String filePath) {
     File file = File(filePath);
-    return file.existsSync();
+    fileExists = file.existsSync();
+    notifyListeners();
+  }
+
+  bool fileExists = true;
+
+  void toggleIsFileExist(bool boolean) {
+    fileExists = boolean;
+    notifyListeners();
   }
 }
