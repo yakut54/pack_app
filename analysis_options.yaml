@@ -6,3 +6,4 @@ linter:
 analyzer:
   errors:
     camel_case_types: false
+    

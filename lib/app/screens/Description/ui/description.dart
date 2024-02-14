@@ -1,6 +1,6 @@
-import 'dart:io';
-import 'package:path_provider/path_provider.dart';
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
+import 'package:hive/hive.dart';
 import '/app/router/export.dart';
 
 class Description extends StatefulWidget {
@@ -13,63 +13,40 @@ class Description extends StatefulWidget {
 
 class _DescriptionState extends State<Description> {
   Session get session => widget.session;
-  bool fileExists = false;
-  bool isBarrierDismissible = true;
 
-  void toggleFileExist() {
-    setState(() {
-      fileExists = true;
-    });
-  }
+  /* Определяем наличие файла */
 
-  String getFileName(track) {
-    RegExp regex = RegExp(r'\/([^\/]+)\.(mp3|mp4)$');
-    Match? match = regex.firstMatch(track);
+  late String filePath; // path/audio.mp3
 
-    if (match != null) {
-      String fileName = match.group(1)!;
-      return fileName;
-    }
-
-    return 'file_name';
-  }
-
-  String getFileExtantion(track) {
-    RegExp regex = RegExp(r'\.([a-zA-Z0-9]+)$');
-    Match? match = regex.firstMatch(track);
-
-    if (match != null) {
-      String extantion = match.group(1)!;
-      return extantion;
-    }
-
-    return 'mp3';
-  }
-
-  String get fileName => '${getFileName(session.track)}.${getFileExtantion(session.track)}';
-
-  void init() async {
-    Directory appDocDir = await getApplicationDocumentsDirectory();
-    String filePath = '${appDocDir.path}/$fileName';
-    fileExists = isFileExists(filePath);
+  void toggleFileExists() async {
+    filePath = await DownloadFileApi().getFilePath(widget.session.track); // name.ext
     setState(() {});
+    DownloadFileApi().isFileExists(filePath); // Проверяем наличие файла
   }
 
-  bool isFileExists(String filePath) {
-    File file = File(filePath);
-    return file.existsSync();
+  /* Значение checkbox записываем в localstorage */
+
+  late Box<dynamic> box; // Have box
+
+  void initHive() async {
+    DownloadFileApi desc = context.read<DownloadFileApi>();
+    box = await HiveBoxVisible().getBox();
+    desc.toggleIsNotVisible(box.get('isNotVisible', defaultValue: false));
+    print('init have ${box.get('isNotVisible', defaultValue: false)}');
+    setState(() {});
+    await box.close();
   }
 
+  bool a = true;
   @override
   void initState() {
     super.initState();
-    init();
+    toggleFileExists();
+    initHive();
   }
 
   @override
   Widget build(BuildContext context) {
-    print('description.dart fileExists >> $fileExists');
-
     return Scaffold(
       body: SafeArea(
         bottom: false,
@@ -97,106 +74,37 @@ class _DescriptionState extends State<Description> {
                 ),
                 child: Stack(
                   children: [
-                    Column(
-                      children: [
-                        _imgBlockWidget(session: session),
-                        const SizedBox(height: 15),
-                        _contentBlockWidget(session: session),
-                        const SizedBox(height: 10),
-                        ElevatedButton(
+                    DescriptionContentWidget(session: session),
+                    Positioned(
+                      right: 10,
+                      child: Container(
+                        decoration: const BoxDecoration(
+                          color: Color.fromARGB(255, 17, 73, 3),
+                          shape: BoxShape.circle,
+                        ),
+                        child: IconButton(
+                          padding: const EdgeInsets.all(0.0),
+                          iconSize: 50,
+                          icon: const Icon(
+                            Icons.download_for_offline_outlined,
+                          ),
                           onPressed: () {
-                            Navigator.push(
-                              context,
-                              MaterialPageRoute(builder: (context) => _controllerRouteWidget()),
+                            showDialog(
+                              barrierDismissible: !context.read<DescriptionApi>().isLoading,
+                              context: context,
+                              builder: (context) {
+                                return PopupDialog(session: session);
+                              },
                             );
                           },
-                          style: ButtonStyle(
-                            padding: MaterialStateProperty.all<EdgeInsets>(
-                              const EdgeInsets.symmetric(
-                                vertical: 4,
-                                horizontal: 15,
-                              ),
-                            ),
-                            backgroundColor: MaterialStateProperty.all<Color>(Colors.transparent),
-                            elevation: MaterialStateProperty.all<double>(0),
-                            shadowColor: MaterialStateProperty.all<Color>(Colors.transparent),
-                            shape: MaterialStateProperty.all<RoundedRectangleBorder>(
-                              RoundedRectangleBorder(
-                                borderRadius: BorderRadius.circular(10),
-                              ),
-                            ),
-                          ),
-                          child: Container(
-                            decoration: BoxDecoration(
-                              gradient: const LinearGradient(
-                                begin: Alignment.topLeft,
-                                end: Alignment.bottomRight,
-                                colors: [
-                                  Color(0xffFF8700),
-                                  Color(0xffF8C740),
-                                  Color(0xffFF8700),
-                                ],
-                                stops: [0.0, 0.56, 1.04],
-                                transform: GradientRotation(135 * 3.14 / 180),
-                              ),
-                              boxShadow: [
-                                BoxShadow(
-                                  color: Colors.black.withOpacity(0.5),
-                                  offset: const Offset(2, 2),
-                                  blurRadius: 3,
-                                ),
-                              ],
-                              borderRadius: BorderRadius.circular(10),
-                            ),
-                            child: Container(
-                              constraints: const BoxConstraints(maxWidth: 220),
-                              alignment: Alignment.center,
-                              child: const Text(
-                                'НАЧАТЬ',
-                                style: TextStyle(
-                                  fontFamily: FontFamily.regularFont,
-                                  fontSize: 24,
-                                  letterSpacing: 6,
-                                  height: 2,
-                                  color: Colors.black,
-                                ),
-                              ),
-                            ),
-                          ),
-                        ),
-                      ],
-                    ),
-                    if (!fileExists)
-                      Positioned(
-                        right: 10,
-                        child: Container(
-                          decoration: const BoxDecoration(
-                            color: Color.fromARGB(255, 2, 52, 99),
-                            shape: BoxShape.circle,
-                          ),
-                          child: IconButton(
-                            padding: const EdgeInsets.all(0.0),
-                            iconSize: 40,
-                            icon: const Icon(
-                              Icons.download_for_offline_outlined,
-                            ),
-                            onPressed: () {
-                              showDialog(
-                                barrierDismissible: false,
-                                context: context,
-                                builder: (BuildContext context) {
-                                  return PopupDialog(
-                                    fileName: fileName,
-                                    session: session,
-                                    toggleParentFileExist: toggleFileExist,
-                                  );
-                                },
-                              );
-                            },
-                            color: AppColors.mainColor,
-                          ),
+                          color: AppColors.mainColor,
                         ),
                       ),
+                    ),
+                    Text(
+                      '${context.watch<DownloadFileApi>().fileExists}',
+                      style: const TextStyle(fontSize: 34, color: AppColors.btnColor),
+                    )
                   ],
                 ),
               ),
@@ -207,18 +115,11 @@ class _DescriptionState extends State<Description> {
       ),
     );
   }
-
-  Widget _controllerRouteWidget() {
-    if (session.type == 'audio') {
-      return AudioScreen(session: session);
-    } else {
-      return VideoScreen(session: session);
-    }
-  }
 }
 
-class _imgBlockWidget extends StatelessWidget {
-  const _imgBlockWidget({
+class DescriptionContentWidget extends StatelessWidget {
+  const DescriptionContentWidget({
+    super.key,
     required this.session,
   });
 
@@ -226,56 +127,21 @@ class _imgBlockWidget extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Container(
-      width: MediaQuery.of(context).size.width * 0.5,
-      padding: const EdgeInsets.symmetric(vertical: 8),
-      decoration: BoxDecoration(
-        boxShadow: [
-          BoxShadow(
-            color: Colors.black.withOpacity(0.47),
-            blurRadius: 4,
-            offset: const Offset(2, 3),
-          ),
-        ],
-        borderRadius: BorderRadius.circular(15.0),
-        color: AppColors.darkColor,
-      ),
-      child: Center(
-        child: Column(
-          children: [
-            FractionallySizedBox(
-              widthFactor: 0.7,
-              child: AspectRatio(
-                aspectRatio: 1,
-                child: Container(
-                  decoration: BoxDecoration(
-                    shape: BoxShape.circle,
-                    image: DecorationImage(
-                      image: NetworkImage(session.sessionImg),
-                      fit: BoxFit.cover,
-                    ),
-                  ),
-                ),
-              ),
-            ),
-            Text(
-              session.subscribe.trim().replaceAll("\\n", "\n"),
-              textAlign: TextAlign.center,
-              style: const TextStyle(
-                fontFamily: FontFamily.regularFont,
-                fontSize: 16,
-                height: 1.3,
-              ),
-            )
-          ],
-        ),
-      ),
+    return Column(
+      children: [
+        imgBlockWidget(session: session),
+        const SizedBox(height: 15),
+        contentBlockWidget(session: session),
+        const SizedBox(height: 10),
+        GradientButtonWidget(session: session),
+      ],
     );
   }
 }
 
-class _contentBlockWidget extends StatelessWidget {
-  const _contentBlockWidget({
+class GradientButtonWidget extends StatelessWidget {
+  const GradientButtonWidget({
+    super.key,
     required this.session,
   });
 
@@ -283,16 +149,68 @@ class _contentBlockWidget extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Container(
-      width: MediaQuery.of(context).size.width * 1.0,
-      color: Colors.white.withOpacity(0.8),
-      padding: const EdgeInsets.all(8.0),
-      child: Text(
-        session.description.trim().replaceAll("\\n", "\n"),
-        textAlign: TextAlign.left,
-        style: const TextStyle(
-          fontSize: 20.0,
-          fontFamily: FontFamily.regularFont,
+    return ElevatedButton(
+      onPressed: () {
+        Navigator.push(
+          context,
+          MaterialPageRoute(
+            builder: (context) {
+              return DescriptionApi().getScreenWidgetBySessionType(session);
+            },
+          ),
+        );
+      },
+      style: ButtonStyle(
+        padding: MaterialStateProperty.all<EdgeInsets>(
+          const EdgeInsets.symmetric(
+            vertical: 4,
+            horizontal: 15,
+          ),
+        ),
+        backgroundColor: MaterialStateProperty.all<Color>(Colors.transparent),
+        elevation: MaterialStateProperty.all<double>(0),
+        shadowColor: MaterialStateProperty.all<Color>(Colors.transparent),
+        shape: MaterialStateProperty.all<RoundedRectangleBorder>(
+          RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(10),
+          ),
+        ),
+      ),
+      child: Container(
+        decoration: BoxDecoration(
+          gradient: const LinearGradient(
+            begin: Alignment.topLeft,
+            end: Alignment.bottomRight,
+            colors: [
+              Color(0xffFF8700),
+              Color(0xffF8C740),
+              Color(0xffFF8700),
+            ],
+            stops: [0.0, 0.56, 1.04],
+            transform: GradientRotation(135 * 3.14 / 180),
+          ),
+          boxShadow: [
+            BoxShadow(
+              color: Colors.black.withOpacity(0.5),
+              offset: const Offset(2, 2),
+              blurRadius: 3,
+            ),
+          ],
+          borderRadius: BorderRadius.circular(10),
+        ),
+        child: Container(
+          constraints: const BoxConstraints(maxWidth: 220),
+          alignment: Alignment.center,
+          child: const Text(
+            'НАЧАТЬ',
+            style: TextStyle(
+              fontFamily: FontFamily.regularFont,
+              fontSize: 24,
+              letterSpacing: 6,
+              height: 2,
+              color: Colors.black,
+            ),
+          ),
         ),
       ),
     );
