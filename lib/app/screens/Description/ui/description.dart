@@ -1,5 +1,5 @@
-import 'dart:io';
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 import 'package:hive/hive.dart';
 import '/app/router/export.dart';
 
@@ -13,53 +13,42 @@ class Description extends StatefulWidget {
 
 class _DescriptionState extends State<Description> {
   Session get session => widget.session;
-  bool fileExists = false;
 
-  late bool isNotVisible;
-  late String fileName;
-  late Box<dynamic> box;
+  /* Определяем наличие файла */
 
-  void toggleFileExist() {
+  late String filePath; // path/audio.mp3
+  bool fileExists = false; // Наличие файла
+
+  void toggleIsFileExist() {
     setState(() {
       fileExists = true;
     });
   }
 
-  void init() async {
-    fileName = DownloadFile().getFileExt(widget.session.track); // name.ext
-    Directory appDocDir = await appDocumentDir();
-    String filePath = '${appDocDir.path}/$fileName';
-    fileExists = DownloadFile().isFileExists(filePath);
+  void checkFileExists() async {
+    filePath = await DownloadFile().getFilePath(widget.session.track); // name.ext
+    fileExists = DownloadFile().isFileExists(filePath); // Проверяем наличие файла
     setState(() {});
   }
+
+  /* Значение checkbox записываем в localstorage */
+
+  // late bool isNotVisible; // Чекбокс "Больше не показывать"
+  late Box<dynamic> box; // Have box
 
   void initHive() async {
+    DownloadFile desc = context.read<DownloadFile>();
     box = await HiveBoxVisible().getBox();
-
-    setState(() {
-      isNotVisible = box.get('isNotVisible', defaultValue: false);
-      print('initHive init $isNotVisible setState after');
-    });
-
-    await box.close();
-  }
-
-  void toggleIsNotVisible(boolean) async {
-    box = await HiveBoxVisible().getBox();
-
-    print('Проверка связи!');
-    isNotVisible = boolean;
-    await box.put('isNotVisible', boolean);
+    desc.toggleIsNotVisible(box.get('isNotVisible', defaultValue: false));
     setState(() {});
-    print('Проверка связи! isNotVisible $isNotVisible');
-
     await box.close();
   }
 
+  bool a = true;
   @override
   void initState() {
     super.initState();
-    init();
+    print('start');
     initHive();
   }
 
@@ -92,75 +81,7 @@ class _DescriptionState extends State<Description> {
                 ),
                 child: Stack(
                   children: [
-                    Column(
-                      children: [
-                        imgBlockWidget(session: session),
-                        const SizedBox(height: 15),
-                        contentBlockWidget(session: session),
-                        const SizedBox(height: 10),
-                        ElevatedButton(
-                          onPressed: () {
-                            Navigator.push(
-                              context,
-                              MaterialPageRoute(builder: (context) => _controllerRouteWidget()),
-                            );
-                          },
-                          style: ButtonStyle(
-                            padding: MaterialStateProperty.all<EdgeInsets>(
-                              const EdgeInsets.symmetric(
-                                vertical: 4,
-                                horizontal: 15,
-                              ),
-                            ),
-                            backgroundColor: MaterialStateProperty.all<Color>(Colors.transparent),
-                            elevation: MaterialStateProperty.all<double>(0),
-                            shadowColor: MaterialStateProperty.all<Color>(Colors.transparent),
-                            shape: MaterialStateProperty.all<RoundedRectangleBorder>(
-                              RoundedRectangleBorder(
-                                borderRadius: BorderRadius.circular(10),
-                              ),
-                            ),
-                          ),
-                          child: Container(
-                            decoration: BoxDecoration(
-                              gradient: const LinearGradient(
-                                begin: Alignment.topLeft,
-                                end: Alignment.bottomRight,
-                                colors: [
-                                  Color(0xffFF8700),
-                                  Color(0xffF8C740),
-                                  Color(0xffFF8700),
-                                ],
-                                stops: [0.0, 0.56, 1.04],
-                                transform: GradientRotation(135 * 3.14 / 180),
-                              ),
-                              boxShadow: [
-                                BoxShadow(
-                                  color: Colors.black.withOpacity(0.5),
-                                  offset: const Offset(2, 2),
-                                  blurRadius: 3,
-                                ),
-                              ],
-                              borderRadius: BorderRadius.circular(10),
-                            ),
-                            child: Container(
-                              constraints: const BoxConstraints(maxWidth: 220),
-                              alignment: Alignment.center,
-                              child: const Text(
-                                'НАЧАТЬ',
-                                style: TextStyle(
-                                  fontFamily: FontFamily.regularFont,
-                                  fontSize: 24,
-                                  letterSpacing: 6,
-                                  height: 2,
-                                  color: Colors.black,
-                                ),
-                              ),
-                            ),
-                          ),
-                        ),
-                      ],
-                    ),
+                    DescriptionContentWidget(session: session),
                     Positioned(
                       right: 10,
                       child: Container(
@@ -175,14 +96,14 @@ class _DescriptionState extends State<Description> {
                             Icons.download_for_offline_outlined,
                           ),
                           onPressed: () {
+                            checkFileExists();
                             showDialog(
-                              barrierDismissible: false,
+                              barrierDismissible: !context.read<DownloadFile>().isLoading,
                               context: context,
-                              builder: (BuildContext context) {
+                              builder: (context) {
                                 return PopupDialog(
-                                  fileName: fileName,
                                   session: session,
-                                  toggleParentFileExist: toggleFileExist,
+                                  toggleParentFileExist: toggleIsFileExist,
                                 );
                               },
                             );
@@ -190,6 +111,10 @@ class _DescriptionState extends State<Description> {
                           color: AppColors.mainColor,
                         ),
                       ),
+                    ),
+                    Text(
+                      '${context.watch<DescriptionApi>().isNotVisible}',
+                      style: const TextStyle(fontSize: 34, color: AppColors.btnColor),
                     )
                   ],
                 ),
@@ -201,12 +126,104 @@ class _DescriptionState extends State<Description> {
       ),
     );
   }
+}
 
-  Widget _controllerRouteWidget() {
-    if (session.type == 'audio') {
-      return AudioScreen(session: session);
-    } else {
-      return VideoScreen(session: session);
-    }
+class DescriptionContentWidget extends StatelessWidget {
+  const DescriptionContentWidget({
+    super.key,
+    required this.session,
+  });
+
+  final Session session;
+
+  @override
+  Widget build(BuildContext context) {
+    return Column(
+      children: [
+        imgBlockWidget(session: session),
+        const SizedBox(height: 15),
+        contentBlockWidget(session: session),
+        const SizedBox(height: 10),
+        GradientButtonWidget(session: session),
+      ],
+    );
+  }
+}
+
+class GradientButtonWidget extends StatelessWidget {
+  const GradientButtonWidget({
+    super.key,
+    required this.session,
+  });
+
+  final Session session;
+
+  @override
+  Widget build(BuildContext context) {
+    return ElevatedButton(
+      onPressed: () {
+        Navigator.push(
+          context,
+          MaterialPageRoute(
+            builder: (context) {
+              return DescriptionApi().controllerRouteWidget(session);
+            },
+          ),
+        );
+      },
+      style: ButtonStyle(
+        padding: MaterialStateProperty.all<EdgeInsets>(
+          const EdgeInsets.symmetric(
+            vertical: 4,
+            horizontal: 15,
+          ),
+        ),
+        backgroundColor: MaterialStateProperty.all<Color>(Colors.transparent),
+        elevation: MaterialStateProperty.all<double>(0),
+        shadowColor: MaterialStateProperty.all<Color>(Colors.transparent),
+        shape: MaterialStateProperty.all<RoundedRectangleBorder>(
+          RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(10),
+          ),
+        ),
+      ),
+      child: Container(
+        decoration: BoxDecoration(
+          gradient: const LinearGradient(
+            begin: Alignment.topLeft,
+            end: Alignment.bottomRight,
+            colors: [
+              Color(0xffFF8700),
+              Color(0xffF8C740),
+              Color(0xffFF8700),
+            ],
+            stops: [0.0, 0.56, 1.04],
+            transform: GradientRotation(135 * 3.14 / 180),
+          ),
+          boxShadow: [
+            BoxShadow(
+              color: Colors.black.withOpacity(0.5),
+              offset: const Offset(2, 2),
+              blurRadius: 3,
+            ),
+          ],
+          borderRadius: BorderRadius.circular(10),
+        ),
+        child: Container(
+          constraints: const BoxConstraints(maxWidth: 220),
+          alignment: Alignment.center,
+          child: const Text(
+            'НАЧАТЬ',
+            style: TextStyle(
+              fontFamily: FontFamily.regularFont,
+              fontSize: 24,
+              letterSpacing: 6,
+              height: 2,
+              color: Colors.black,
+            ),
+          ),
+        ),
+      ),
+    );
   }
 }

@@ -9,7 +9,10 @@ void main() {
 
   runApp(
     MultiProvider(
-      providers: [ChangeNotifierProvider(create: (context) => DownloadFile())],
+      providers: [
+        ChangeNotifierProvider(create: (context) => DownloadFile()),
+        ChangeNotifierProvider(create: (context) => DescriptionApi()),
+      ],
       child: const App(),
     ),
   );

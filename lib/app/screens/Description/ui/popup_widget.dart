@@ -1,15 +1,14 @@
 import 'package:flutter/material.dart';
+import 'package:hive/hive.dart';
 import 'package:pack_app/app/router/export.dart';
 import 'package:provider/provider.dart';
 
 class PopupDialog extends StatefulWidget {
-  final String fileName;
   final Session session;
   final void Function() toggleParentFileExist;
 
   const PopupDialog({
     Key? key,
-    required this.fileName,
     required this.session,
     required this.toggleParentFileExist,
   }) : super(key: key);
@@ -19,7 +18,20 @@ class PopupDialog extends StatefulWidget {
 }
 
 class PopupDialogState extends State<PopupDialog> {
-  void initDownload() {}
+  bool _hideDialog = false;
+
+  void initDownload() {
+    context.read<DownloadFile>().toggleIsLoading(true);
+  }
+
+  // Checkbox off/on
+  void toggleButtonCallDialodVisible(bool boolean) async {
+    DescriptionApi desc = context.read<DescriptionApi>();
+    Box<dynamic> box = await HiveBoxVisible().getBox();
+    await box.put('isNotVisible', boolean);
+    desc.toggleIsNotVisible(boolean);
+    await box.close();
+  }
 
   @override
   void initState() {
@@ -28,9 +40,12 @@ class PopupDialogState extends State<PopupDialog> {
 
   @override
   Widget build(BuildContext context) {
+    DownloadFile ctxWD = context.watch<DownloadFile>();
+    DownloadFile ctxRD = context.read<DownloadFile>();
+
     return AlertDialog(
-      contentPadding: const EdgeInsets.all(16),
-      insetPadding: const EdgeInsets.all(10),
+      contentPadding: const EdgeInsets.only(top: 10, right: 16, bottom: 10, left: 6),
+      insetPadding: const EdgeInsets.all(8),
       title: Row(
         children: [
           SizedBox(
@@ -44,8 +59,14 @@ class PopupDialogState extends State<PopupDialog> {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Text(widget.session.type, style: const TextStyle(fontFamily: FontFamily.semiFont, fontSize: 22)),
-                Text(widget.fileName, style: const TextStyle(fontFamily: FontFamily.semiFont, fontSize: 22)),
+                Text(
+                  ctxWD.getTypeFile(widget.session.type),
+                  style: const TextStyle(fontFamily: FontFamily.semiFont, fontSize: 22),
+                ),
+                Text(
+                  ctxWD.getFileNameExtention(widget.session.track),
+                  style: const TextStyle(fontFamily: FontFamily.semiFont, fontSize: 22),
+                ),
               ],
             ),
           ),
@@ -53,21 +74,27 @@ class PopupDialogState extends State<PopupDialog> {
       ),
       content: Column(
         mainAxisSize: MainAxisSize.min,
+        crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          const Text(
-            'Вы можете скачать файл на устройство, для дальнейшего использования \nв отсутствии интернета',
-            style: TextStyle(fontFamily: FontFamily.regularFont, fontSize: 18),
+          const Padding(
+            padding: EdgeInsets.only(left: 16),
+            child: Text(
+              'Вы можете скачать файл \n'
+              'на устройство, для дальнейшего\n'
+              'использования в отсутствии интернета',
+              style: TextStyle(fontFamily: FontFamily.regularFont, fontSize: 19),
+            ),
           ),
           Row(
             mainAxisAlignment: MainAxisAlignment.start,
             children: [
               Checkbox(
                 value: context.read<DownloadFile>().isLoading,
-                onChanged: (value) async {
-                  setState(() {
-                    context.read<DownloadFile>().isLoading = value ?? false;
-                  });
-                  // context.read<DownloadFile>().toggleIsLoading(value);
+                onChanged: (value) {
+                  _hideDialog = value ?? false;
+                  setState(() {});
+                  ctxRD.toggleIsLoading(_hideDialog);
+                  toggleButtonCallDialodVisible(_hideDialog);
                 },
               ),
               const Text(

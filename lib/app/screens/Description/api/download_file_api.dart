@@ -1,8 +1,8 @@
 import 'dart:io';
+import 'app_document_dir.dart';
+import 'description_api.dart';
 
-import 'package:flutter/material.dart';
-
-class DownloadFile extends ChangeNotifier {
+class DownloadFile extends DescriptionApi {
   bool isLoading = false;
 
   void toggleIsLoading(bool boolean) {
@@ -22,7 +22,7 @@ class DownloadFile extends ChangeNotifier {
     return 'file_name';
   }
 
-  String getFileExtantion(String track) {
+  String getFileExtention(String track) {
     RegExp regex = RegExp(r'\.([a-zA-Z0-9]+)$');
     Match? match = regex.firstMatch(track);
 
@@ -34,8 +34,17 @@ class DownloadFile extends ChangeNotifier {
     return 'mp3';
   }
 
-  String getFileExt(String track) {
-    return '${getFileName(track)}.${getFileExtantion(track)}';
+  String getFileNameExtention(track) {
+    return '${getFileName(track)}.${getFileExtention(track)}';
+  }
+
+  String getTypeFile(type) {
+    return type == 'audio' ? 'Аудиофайл' : 'Видеофайл';
+  }
+
+  Future<String> getFilePath(String track) async {
+    Directory appDocDir = await appDocumentDir(); // Создаём дирректорию для сохранения файлов
+    return '${appDocDir.path}/${getFileName(track)}.${getFileExtention(track)}';
   }
 
   bool isFileExists(String filePath) {
@@ -43,6 +52,3 @@ class DownloadFile extends ChangeNotifier {
     return file.existsSync();
   }
 }
-
-
-// context.read<DownloadFile>().isLoading.toString()
