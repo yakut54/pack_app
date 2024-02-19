@@ -13,58 +13,28 @@ class Description extends StatefulWidget {
 
 class _DescriptionState extends State<Description> {
   Session get session => widget.session;
-  bool fileExists = false;
+  bool isFileExists = true;
+  String filePath = '';
 
-  late bool isNotVisible;
-  late String fileName;
-  late Box<dynamic> box;
+  void toggleFileExists() async {
+    filePath = await FileApi().getFilePath(session.track);
 
-  void toggleFileExist() {
-    setState(() {
-      fileExists = true;
-    });
-  }
-
-  void init() async {
-    fileName = DownloadFile().getFileExt(widget.session.track); // name.ext
-    Directory appDocDir = await appDocumentDir();
-    String filePath = '${appDocDir.path}/$fileName';
-    fileExists = DownloadFile().isFileExists(filePath);
+    print('3 isFileExists $isFileExists filePath $filePath');
+    isFileExists = FileApi.isFileExists(filePath);
+    print('4 isFileExists $isFileExists filePath $filePath');
     setState(() {});
-  }
-
-  void initHive() async {
-    box = await HiveBoxVisible().getBox();
-
-    setState(() {
-      isNotVisible = box.get('isNotVisible', defaultValue: false);
-      print('initHive init $isNotVisible setState after');
-    });
-
-    await box.close();
-  }
-
-  void toggleIsNotVisible(boolean) async {
-    box = await HiveBoxVisible().getBox();
-
-    print('Проверка связи!');
-    isNotVisible = boolean;
-    await box.put('isNotVisible', boolean);
-    setState(() {});
-    print('Проверка связи! isNotVisible $isNotVisible');
-
-    await box.close();
   }
 
   @override
   void initState() {
     super.initState();
-    init();
-    initHive();
+    toggleFileExists();
+    print('1 isFileExists $isFileExists filePath $filePath');
   }
 
   @override
   Widget build(BuildContext context) {
+    print('2 isFileExists $isFileExists filePath $filePath');
     return Scaffold(
       body: SafeArea(
         bottom: false,
@@ -76,6 +46,12 @@ class _DescriptionState extends State<Description> {
                 packSubtitle: session.subtitle.trim().replaceAll("\\n", "\n"),
               ),
               const SizedBox(height: 10),
+              Text(
+                isFileExists ? 'true' : 'false',
+                style: const TextStyle(
+                  fontSize: 26,
+                ),
+              ),
               Container(
                 width: MediaQuery.of(context).size.width * 0.96,
                 padding: const EdgeInsets.all(10),
@@ -161,36 +137,41 @@ class _DescriptionState extends State<Description> {
                         ),
                       ],
                     ),
-                    Positioned(
-                      right: 10,
-                      child: Container(
-                        decoration: const BoxDecoration(
-                          color: Color.fromARGB(255, 2, 52, 99),
-                          shape: BoxShape.circle,
-                        ),
-                        child: IconButton(
-                          padding: const EdgeInsets.all(0.0),
-                          iconSize: 40,
-                          icon: const Icon(
-                            Icons.download_for_offline_outlined,
-                          ),
-                          onPressed: () {
-                            showDialog(
-                              barrierDismissible: false,
-                              context: context,
-                              builder: (BuildContext context) {
-                                return PopupDialog(
-                                  fileName: fileName,
-                                  session: session,
-                                  toggleParentFileExist: toggleFileExist,
-                                );
-                              },
-                            );
-                          },
-                          color: AppColors.mainColor,
-                        ),
-                      ),
-                    )
+                    isFileExists
+                        ? const SizedBox()
+                        : Positioned(
+                            right: 10,
+                            child: Container(
+                              decoration: const BoxDecoration(
+                                color: Color.fromARGB(255, 2, 52, 99),
+                                shape: BoxShape.circle,
+                              ),
+                              child: IconButton(
+                                padding: const EdgeInsets.all(0.0),
+                                iconSize: 40,
+                                icon: const Icon(
+                                  Icons.download_for_offline_outlined,
+                                ),
+                                onPressed: () {
+                                  showDialog(
+                                    barrierDismissible: false,
+                                    context: context,
+                                    builder: (BuildContext context) {
+                                      print('5 isFileExists $isFileExists filePath $filePath');
+                                      return PopupDialog(
+                                        filePath: filePath,
+                                        session: session,
+                                      );
+                                    },
+                                  ).then((value) {
+                                    toggleFileExists();
+                                    print('6 isFileExists $isFileExists filePath $filePath');
+                                  });
+                                },
+                                color: AppColors.mainColor,
+                              ),
+                            ),
+                          )
                   ],
                 ),
               ),
@@ -210,3 +191,55 @@ class _DescriptionState extends State<Description> {
     }
   }
 }
+
+
+
+  // bool fileExists = false;
+
+  // late bool isNotVisible;
+  // late String fileName;
+  // late Box<dynamic> box;
+
+  // void toggleFileExist() {
+  //   setState(() {
+  //     fileExists = true;
+  //   });
+  // }
+
+  // void init() async {
+  //   fileName = DownloadFile().getFileExt(widget.session.track); // name.ext
+  //   Directory appDocDir = await appDocumentDir();
+  //   String filePath = '${appDocDir.path}/$fileName';
+  //   fileExists = DownloadFile().isFileExists(filePath);
+  //   setState(() {});
+  // }
+
+  // void initHive() async {
+  //   box = await HiveBoxVisible().getBox();
+
+  //   setState(() {
+  //     isNotVisible = box.get('isNotVisible', defaultValue: false);
+  //     print('initHive init $isNotVisible setState after');
+  //   });
+
+  //   await box.close();
+  // }
+
+  // void toggleIsNotVisible(boolean) async {
+  //   box = await HiveBoxVisible().getBox();
+
+  //   print('Проверка связи!');
+  //   isNotVisible = boolean;
+  //   await box.put('isNotVisible', boolean);
+  //   setState(() {});
+  //   print('Проверка связи! isNotVisible $isNotVisible');
+
+  //   await box.close();
+  // }
+
+  // @override
+  // void initState() {
+  //   super.initState();
+  //   init();
+  //   initHive();
+  // }
