@@ -180,9 +180,9 @@ class PopupDialogState extends State<PopupDialog> {
 }
 
 class YPreloader extends StatelessWidget {
-  double downloadProgress = 0;
+  final double downloadProgress;
 
-  YPreloader({
+  const YPreloader({
     Key? key,
     required this.downloadProgress,
   }) : super(key: key);
