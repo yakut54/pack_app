@@ -27,11 +27,10 @@ class PackRepo implements APackRepo {
   }
 
   Pack getPack(Map<String, dynamic> jsonData) {
-    // final Map<String, dynamic> jsonData = jsonDecode(response);
     final Map<String, dynamic> packWrapper = jsonData['packWrapper'];
     final List<dynamic> sessions = jsonData['sessionsList'];
 
-    return Pack(
+    var pack = Pack(
       title: packWrapper['title'],
       subtitle: packWrapper['subtitle'],
       backgroundImg: packWrapper['background_img'],
@@ -47,5 +46,7 @@ class PackRepo implements APackRepo {
               ))
           .toList(),
     );
+
+    return pack;
   }
 }
