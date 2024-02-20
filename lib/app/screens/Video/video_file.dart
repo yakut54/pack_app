@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:video_player/video_player.dart';
 
-import '/app/router/export.dart';
+import '/app/imports/all_imports.dart';
 
 class VideoFile extends StatefulWidget {
   final Session session;

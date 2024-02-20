@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import '/app/router/export.dart';
+import '/app/imports/all_imports.dart';
 
 class imgBlockWidget extends StatelessWidget {
   const imgBlockWidget({

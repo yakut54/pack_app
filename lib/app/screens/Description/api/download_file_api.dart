@@ -1,6 +1,6 @@
 import 'dart:io';
 import 'package:flutter/material.dart';
-import '/app/router/export.dart';
+import '/app/imports/all_imports.dart';
 
 class FileApi extends ChangeNotifier {
   String getFileInfo(String track, RegExp regex, String defaultValue) {

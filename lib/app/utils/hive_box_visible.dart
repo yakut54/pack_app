@@ -1,6 +1,6 @@
 import 'dart:io';
 import 'package:hive/hive.dart';
-import '/app/router/export.dart';
+import '/app/imports/all_imports.dart';
 
 class HiveBoxVisible {
   Future<Box<dynamic>> getBox() async {

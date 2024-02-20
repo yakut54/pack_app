@@ -1,7 +1,7 @@
 import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:hive/hive.dart';
-import '/app/router/export.dart';
+import '/app/imports/all_imports.dart';
 
 class Description extends StatefulWidget {
   final Session session;

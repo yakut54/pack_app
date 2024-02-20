@@ -1,9 +1,7 @@
-// ignore_for_file: public_member_api_docs, sort_constructors_first
 import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-
-import 'package:pack_app/app/router/export.dart';
+import '/app/imports/all_imports.dart';
 
 class PopupDialog extends StatefulWidget {
   final String filePath;

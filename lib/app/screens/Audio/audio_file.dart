@@ -1,7 +1,6 @@
 import 'package:audioplayers/audioplayers.dart';
 import 'package:flutter/material.dart';
-import 'package:pack_app/app/models/index.dart';
-import 'package:pack_app/app/router/export.dart';
+import '/app/imports/all_imports.dart';
 
 class Player extends StatefulWidget {
   final AudioPlayer player;

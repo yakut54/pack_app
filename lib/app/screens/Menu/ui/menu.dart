@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:get_it/get_it.dart';
 import 'package:pack_app/app/bloc/pack_bloc.dart';
-import '/app/router/export.dart';
+import '/app/imports/all_imports.dart';
 import 'list_tile_widget.dart';
 
 class Menu extends StatefulWidget {

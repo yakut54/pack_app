@@ -2,7 +2,7 @@
 import 'package:audioplayers/audioplayers.dart';
 import 'package:flutter/material.dart';
 import 'package:pack_app/app/screens/Audio/audio_file.dart';
-import '/app/router/export.dart';
+import '/app/imports/all_imports.dart';
 
 class AudioScreen extends StatefulWidget {
   final Session session;
