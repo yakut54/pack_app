@@ -18,7 +18,8 @@ class PopupDialog extends StatefulWidget {
 }
 
 class PopupDialogState extends State<PopupDialog> {
-  bool isLoading = false;
+  bool isCanPop = true;
+  bool isLoading = !false;
   bool isNotVisible = false;
   double downloadProgress = 0;
 
@@ -27,7 +28,9 @@ class PopupDialogState extends State<PopupDialog> {
   Future<void> initDownload() async {
     setState(() {
       isLoading = true;
+      isCanPop = false;
     });
+
     print('start downloadisLoading $isLoading');
 
     Dio dio = Dio();
@@ -49,6 +52,7 @@ class PopupDialogState extends State<PopupDialog> {
 
     setState(() {
       isLoading = false;
+      isCanPop = true;
     });
 
     print('goToBack');
@@ -83,67 +87,88 @@ class PopupDialogState extends State<PopupDialog> {
 
   @override
   Widget build(BuildContext context) {
-    return AlertDialog(
-      contentPadding: const EdgeInsets.all(16),
-      insetPadding: const EdgeInsets.all(10),
-      title: Row(
-        children: isLoading
-            ? []
-            : [
-                SizedBox(
-                  width: 60,
-                  child: Image.asset(
-                    'assets/images/__${widget.session.type}__.png',
+    return PopScope(
+      canPop: isCanPop,
+      child: AlertDialog(
+        contentPadding: const EdgeInsets.all(16),
+        insetPadding: const EdgeInsets.all(10),
+        title: Row(
+          children: isLoading
+              ? const []
+              : [
+                  SizedBox(
+                    width: 60,
+                    child: Image.asset(
+                      'assets/images/__${widget.session.type}__.png',
+                    ),
                   ),
-                ),
-                const SizedBox(width: 8),
-                Expanded(
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
+                  const SizedBox(width: 8),
+                  Expanded(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          widget.session.type,
+                          style: const TextStyle(
+                            fontFamily: FontFamily.semiFont,
+                            fontSize: 22,
+                          ),
+                        ),
+                        Text(
+                          context.watch<FileApi>().getFileNameExtension(widget.session.track),
+                          style: const TextStyle(
+                            fontFamily: FontFamily.semiFont,
+                            fontSize: 22,
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                ],
+        ),
+        content: Builder(builder: (context) {
+          double width = MediaQuery.of(context).size.width;
+          return SizedBox(
+            width: width - 70,
+            child: isLoading
+                ? YPreloader(downloadProgress: downloadProgress)
+                : Column(
+                    mainAxisSize: MainAxisSize.min,
                     children: [
-                      Text(widget.session.type, style: const TextStyle(fontFamily: FontFamily.semiFont, fontSize: 22)),
-                      Text(context.watch<FileApi>().getFileNameExtension(widget.session.track),
-                          style: const TextStyle(fontFamily: FontFamily.semiFont, fontSize: 22)),
+                      const Text(
+                        'Вы можете скачать файл на устройство, для дальнейшего использования \n'
+                        'в отсутствии интернета',
+                        style: TextStyle(fontFamily: FontFamily.regularFont, fontSize: 18),
+                      ),
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.start,
+                        children: [
+                          Checkbox(
+                            value: isNotVisible,
+                            onChanged: (value) async {
+                              toggleNotVisible();
+                            },
+                          ),
+                          TextButton(
+                            onPressed: () {
+                              toggleNotVisible();
+                            },
+                            child: const Text(
+                              'Больше не показывать',
+                              style: TextStyle(
+                                fontFamily: FontFamily.regularFont,
+                                fontSize: 16,
+                              ),
+                            ),
+                          )
+                        ],
+                      ),
                     ],
                   ),
-                ),
-              ],
+          );
+        }),
+        actions: isLoading ? const [] : buttons(),
       ),
-      content: isLoading
-          ? YPreloader(downloadProgress: downloadProgress)
-          : Column(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                const Text(
-                  'Вы можете скачать файл на устройство, для дальнейшего использования \nв отсутствии интернета',
-                  style: TextStyle(fontFamily: FontFamily.regularFont, fontSize: 18),
-                ),
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.start,
-                  children: [
-                    Checkbox(
-                      value: isNotVisible,
-                      onChanged: (value) async {
-                        toggleNotVisible();
-                      },
-                    ),
-                    TextButton(
-                      onPressed: () {
-                        toggleNotVisible();
-                      },
-                      child: const Text(
-                        'Больше не показывать',
-                        style: TextStyle(
-                          fontFamily: FontFamily.regularFont,
-                          fontSize: 16,
-                        ),
-                      ),
-                    )
-                  ],
-                ),
-              ],
-            ),
-      actions: isLoading ? [] : buttons(),
     );
   }
 
@@ -191,15 +216,12 @@ class YPreloader extends StatelessWidget {
       mainAxisSize: MainAxisSize.min,
       crossAxisAlignment: CrossAxisAlignment.center,
       children: [
-        const Padding(
-          padding: EdgeInsets.only(left: 16),
-          child: Text(
-            'Идёт загрузка файла\n'
-            'Не выключайте телефон\n'
-            'и не выходите из приложения.',
-            style: TextStyle(fontFamily: FontFamily.semiFont, fontSize: 22),
-            textAlign: TextAlign.center,
-          ),
+        const Text(
+          'Идёт загрузка файла\n'
+          'Не выключайте телефон\n'
+          'и не выходите из приложения.',
+          style: TextStyle(fontFamily: FontFamily.semiFont, fontSize: 20),
+          textAlign: TextAlign.center,
         ),
         const SizedBox(height: 30),
         Expanded(
@@ -212,7 +234,7 @@ class YPreloader extends StatelessWidget {
                   height: 90.0,
                   child: CircularProgressIndicator(
                     color: AppColors.btnColor,
-                    backgroundColor: const Color.fromARGB(255, 56, 177, 141),
+                    backgroundColor: AppColors.prloaderColor,
                     strokeWidth: 20,
                     value: downloadProgress,
                     strokeCap: StrokeCap.round,

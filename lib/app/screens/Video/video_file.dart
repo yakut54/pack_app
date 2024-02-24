@@ -5,10 +5,12 @@ import '/app/imports/all_imports.dart';
 
 class VideoFile extends StatefulWidget {
   final Session session;
+  final bool isFileExists;
 
   const VideoFile({
     Key? key,
     required this.session,
+    required this.isFileExists,
   }) : super(key: key);
 
   @override

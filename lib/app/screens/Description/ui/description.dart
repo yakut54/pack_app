@@ -1,6 +1,4 @@
-import 'dart:io';
 import 'package:flutter/material.dart';
-import 'package:hive/hive.dart';
 import '/app/imports/all_imports.dart';
 
 class Description extends StatefulWidget {
@@ -70,15 +68,15 @@ class _DescriptionState extends State<Description> {
                   children: [
                     Column(
                       children: [
-                        imgBlockWidget(session: session),
+                        ImgBlockWidget(session: session),
                         const SizedBox(height: 15),
-                        contentBlockWidget(session: session),
+                        TextDescriptionWidget(session: session),
                         const SizedBox(height: 10),
                         ElevatedButton(
                           onPressed: () {
                             Navigator.push(
                               context,
-                              MaterialPageRoute(builder: (context) => _controllerRouteWidget()),
+                              MaterialPageRoute(builder: (context) => _controllerRouteWidget(isFileExists)),
                             );
                           },
                           style: ButtonStyle(
@@ -183,11 +181,11 @@ class _DescriptionState extends State<Description> {
     );
   }
 
-  Widget _controllerRouteWidget() {
+  Widget _controllerRouteWidget(isFileExists) {
     if (session.type == 'audio') {
-      return AudioScreen(session: session);
+      return AudioScreen(session: session, isFileExists: isFileExists);
     } else {
-      return VideoScreen(session: session);
+      return VideoScreen(session: session, isFileExists: isFileExists);
     }
   }
 }

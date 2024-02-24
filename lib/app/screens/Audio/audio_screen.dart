@@ -6,7 +6,13 @@ import '/app/imports/all_imports.dart';
 
 class AudioScreen extends StatefulWidget {
   final Session session;
-  const AudioScreen({super.key, required this.session});
+  final bool isFileExists;
+
+  const AudioScreen({
+    super.key,
+    required this.session,
+    required this.isFileExists,
+  });
 
   @override
   State<AudioScreen> createState() => _AudioScreenState();
@@ -79,6 +85,7 @@ class _AudioScreenState extends State<AudioScreen> {
                           child: Player(
                             player: player,
                             session: widget.session,
+                            isFileExists: widget.isFileExists,
                           ),
                         )
                       ],

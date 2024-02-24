@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 import '/app/imports/all_imports.dart';
 
-class imgBlockWidget extends StatelessWidget {
-  const imgBlockWidget({
+class ImgBlockWidget extends StatelessWidget {
+  const ImgBlockWidget({
     super.key,
     required this.session,
   });

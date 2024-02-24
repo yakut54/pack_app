@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 import '/app/imports/all_imports.dart';
 
-class contentBlockWidget extends StatelessWidget {
-  const contentBlockWidget({
+class TextDescriptionWidget extends StatelessWidget {
+  const TextDescriptionWidget({
     super.key,
     required this.session,
   });

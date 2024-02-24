@@ -5,8 +5,14 @@ import '/app/imports/all_imports.dart';
 class Player extends StatefulWidget {
   final AudioPlayer player;
   final Session session;
+  final bool isFileExists;
 
-  const Player({Key? key, required this.player, required this.session}) : super(key: key);
+  const Player({
+    Key? key,
+    required this.player,
+    required this.session,
+    required this.isFileExists,
+  }) : super(key: key);
 
   @override
   State<Player> createState() => _PlayerState();
@@ -90,10 +96,12 @@ class _PlayerState extends State<Player> {
 
   @override
   Widget build(BuildContext context) {
-    return WillPopScope(
-      onWillPop: () async {
-        widget.player.stop();
-        return true;
+    return PopScope(
+      canPop: true,
+      onPopInvoked: (didPop) {
+        if (didPop) {
+          widget.player.stop();
+        }
       },
       child: Container(
         margin: const EdgeInsets.only(top: 20),
@@ -128,5 +136,10 @@ class _PlayerState extends State<Player> {
         ),
       ),
     );
+  }
+
+  @override
+  void dispose() {
+    super.dispose();
   }
 }

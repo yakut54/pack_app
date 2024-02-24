@@ -3,7 +3,13 @@ import '/app/imports/all_imports.dart';
 
 class VideoScreen extends StatefulWidget {
   final Session session;
-  const VideoScreen({super.key, required this.session});
+  final bool isFileExists;
+
+  const VideoScreen({
+    super.key,
+    required this.session,
+    required this.isFileExists,
+  });
 
   @override
   State<VideoScreen> createState() => _VideoScreenState();
@@ -49,7 +55,7 @@ class _VideoScreenState extends State<VideoScreen> {
                         height: 1.3,
                       ),
                     ),
-                    VideoFile(session: widget.session)
+                    VideoFile(session: widget.session, isFileExists: widget.isFileExists),
                   ],
                 ),
               ),
