@@ -19,7 +19,7 @@ class PopupDialog extends StatefulWidget {
 
 class PopupDialogState extends State<PopupDialog> {
   bool isCanPop = true;
-  bool isLoading = !false;
+  bool isLoading = false;
   bool isNotVisible = false;
   double downloadProgress = 0;
 

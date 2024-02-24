@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_html/flutter_html.dart';
 import '/app/imports/all_imports.dart';
 
 class Description extends StatefulWidget {
@@ -16,10 +17,7 @@ class _DescriptionState extends State<Description> {
 
   void toggleFileExists() async {
     filePath = await FileApi().getFilePath(session.track);
-
-    print('3 isFileExists $isFileExists filePath $filePath');
     isFileExists = FileApi.isFileExists(filePath);
-    print('4 isFileExists $isFileExists filePath $filePath');
     setState(() {});
   }
 
@@ -27,12 +25,10 @@ class _DescriptionState extends State<Description> {
   void initState() {
     super.initState();
     toggleFileExists();
-    print('1 isFileExists $isFileExists filePath $filePath');
   }
 
   @override
   Widget build(BuildContext context) {
-    print('2 isFileExists $isFileExists filePath $filePath');
     return Scaffold(
       body: SafeArea(
         bottom: false,
@@ -44,12 +40,6 @@ class _DescriptionState extends State<Description> {
                 packSubtitle: session.subtitle.trim().replaceAll("\\n", "\n"),
               ),
               const SizedBox(height: 10),
-              Text(
-                isFileExists ? 'true' : 'false',
-                style: const TextStyle(
-                  fontSize: 26,
-                ),
-              ),
               Container(
                 width: MediaQuery.of(context).size.width * 0.96,
                 padding: const EdgeInsets.all(10),
@@ -138,7 +128,7 @@ class _DescriptionState extends State<Description> {
                     isFileExists
                         ? const SizedBox()
                         : Positioned(
-                            right: 10,
+                            right: 0,
                             child: Container(
                               decoration: const BoxDecoration(
                                 color: Color.fromARGB(255, 2, 52, 99),
@@ -155,7 +145,6 @@ class _DescriptionState extends State<Description> {
                                     barrierDismissible: false,
                                     context: context,
                                     builder: (BuildContext context) {
-                                      print('5 isFileExists $isFileExists filePath $filePath');
                                       return PopupDialog(
                                         filePath: filePath,
                                         session: session,
@@ -163,7 +152,6 @@ class _DescriptionState extends State<Description> {
                                     },
                                   ).then((value) {
                                     toggleFileExists();
-                                    print('6 isFileExists $isFileExists filePath $filePath');
                                   });
                                 },
                                 color: AppColors.mainColor,

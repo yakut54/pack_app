@@ -37,12 +37,14 @@ class PackRepo implements APackRepo {
       sessions: sessions
           .map((session) => Session(
                 type: session['type'],
+                track: session['track'],
                 title: session['title'],
                 subtitle: session['subtitle'],
-                description: session['description'],
-                sessionImg: session['session_img'],
-                track: session['track'],
+                trackImg: session['track_img'],
                 subscribe: session['subscribe'],
+                sessionImg: session['session_img'],
+                description: session['description'],
+                recomendation: session['recomendation'],
               ))
           .toList(),
     );

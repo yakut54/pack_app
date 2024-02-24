@@ -59,7 +59,7 @@ class _AudioScreenState extends State<AudioScreen> {
                           decoration: BoxDecoration(
                             shape: BoxShape.circle,
                             image: DecorationImage(
-                              image: NetworkImage(widget.session.sessionImg),
+                              image: NetworkImage(widget.session.trackImg),
                               fit: BoxFit.cover,
                             ),
                           ),

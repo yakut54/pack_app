@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 class FontFamily {
   static const regularFont = 'AkrobatRegular';
   static const semiFont = 'AkrobatSemibold';
+  static const extraboldFont = 'AkrobatExtrabold';
 }
 
 class AppColors {

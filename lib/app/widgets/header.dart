@@ -86,7 +86,7 @@ class Header extends StatelessWidget {
                                 mainAxisAlignment: MainAxisAlignment.center,
                                 children: [
                                   Text(
-                                    packTitle,
+                                    packTitle.trim().replaceAll("\\n", "\n"),
                                     style: TextStyle(
                                         fontFamily: FontFamily.semiFont,
                                         fontSize: responsiveSizes.fontSizeHeaderLarge,
@@ -94,7 +94,7 @@ class Header extends StatelessWidget {
                                         color: const Color(0xFFC09D52)),
                                   ),
                                   Text(
-                                    packSubtitle,
+                                    packSubtitle.trim().replaceAll("\\n", "\n"),
                                     style: TextStyle(
                                         fontFamily: FontFamily.regularFont,
                                         fontSize: responsiveSizes.fontSizeHeaderSmall,

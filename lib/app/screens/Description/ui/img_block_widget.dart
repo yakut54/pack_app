@@ -12,8 +12,8 @@ class ImgBlockWidget extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
-      width: MediaQuery.of(context).size.width * 0.5,
-      padding: const EdgeInsets.symmetric(vertical: 8),
+      width: MediaQuery.of(context).size.width * 0.6,
+      padding: const EdgeInsets.only(bottom: 16),
       decoration: BoxDecoration(
         boxShadow: [
           BoxShadow(
@@ -29,7 +29,7 @@ class ImgBlockWidget extends StatelessWidget {
         child: Column(
           children: [
             FractionallySizedBox(
-              widthFactor: 0.7,
+              widthFactor: 0.9,
               child: AspectRatio(
                 aspectRatio: 1,
                 child: Container(
@@ -48,7 +48,7 @@ class ImgBlockWidget extends StatelessWidget {
               textAlign: TextAlign.center,
               style: const TextStyle(
                 fontFamily: FontFamily.regularFont,
-                fontSize: 16,
+                fontSize: 17,
                 height: 1.3,
               ),
             )
