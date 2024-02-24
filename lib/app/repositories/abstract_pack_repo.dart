@@ -1,4 +1,4 @@
-import '/app/router/export.dart';
+import '/app/imports/all_imports.dart';
 
 abstract class APackRepo {
   Future<Pack> getPackWrapper();

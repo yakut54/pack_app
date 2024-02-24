@@ -1,7 +1,7 @@
 import 'dart:convert';
 
 import 'package:dio/dio.dart';
-import '/app/router/export.dart';
+import '/app/imports/all_imports.dart';
 
 class PackRepo implements APackRepo {
   @override
@@ -27,25 +27,28 @@ class PackRepo implements APackRepo {
   }
 
   Pack getPack(Map<String, dynamic> jsonData) {
-    // final Map<String, dynamic> jsonData = jsonDecode(response);
     final Map<String, dynamic> packWrapper = jsonData['packWrapper'];
     final List<dynamic> sessions = jsonData['sessionsList'];
 
-    return Pack(
+    var pack = Pack(
       title: packWrapper['title'],
       subtitle: packWrapper['subtitle'],
       backgroundImg: packWrapper['background_img'],
       sessions: sessions
           .map((session) => Session(
                 type: session['type'],
+                track: session['track'],
                 title: session['title'],
                 subtitle: session['subtitle'],
-                description: session['description'],
-                sessionImg: session['session_img'],
-                track: session['track'],
+                trackImg: session['track_img'],
                 subscribe: session['subscribe'],
+                sessionImg: session['session_img'],
+                description: session['description'],
+                recomendation: session['recomendation'],
               ))
           .toList(),
     );
+
+    return pack;
   }
 }

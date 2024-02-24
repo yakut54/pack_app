@@ -1,14 +1,16 @@
 import 'package:flutter/material.dart';
 import 'package:video_player/video_player.dart';
 
-import '/app/router/export.dart';
+import '/app/imports/all_imports.dart';
 
 class VideoFile extends StatefulWidget {
   final Session session;
+  final bool isFileExists;
 
   const VideoFile({
     Key? key,
     required this.session,
+    required this.isFileExists,
   }) : super(key: key);
 
   @override
@@ -53,7 +55,7 @@ class _VideoFileState extends State<VideoFile> {
                 alignment: Alignment.bottomCenter,
                 children: [
                   VideoPlayer(_controller),
-                  _ControlsOverlay(controller: _controller),
+                  _ControlsOverlay(controller: _controller, session: widget.session),
                   VideoProgressIndicator(_controller, allowScrubbing: true),
                 ],
               ),
@@ -66,7 +68,10 @@ class _VideoFileState extends State<VideoFile> {
 }
 
 class _ControlsOverlay extends StatelessWidget {
-  const _ControlsOverlay({required this.controller});
+  const _ControlsOverlay({
+    required this.controller,
+    required this.session,
+  });
 
   static const List<double> _examplePlaybackRates = <double>[
     0.25,
@@ -80,6 +85,7 @@ class _ControlsOverlay extends StatelessWidget {
   ];
 
   final VideoPlayerController controller;
+  final Session session;
 
   @override
   Widget build(BuildContext context) {
@@ -91,10 +97,9 @@ class _ControlsOverlay extends StatelessWidget {
           child: controller.value.isPlaying
               ? const SizedBox.shrink()
               : Container(
-                  decoration: const BoxDecoration(
+                  decoration: BoxDecoration(
                     image: DecorationImage(
-                      image: NetworkImage(
-                          'https://api.selcdn.ru/v1/SEL_53369/mng/receive/images/poster_while_for_life.jpg'),
+                      image: NetworkImage(session.trackImg),
                       fit: BoxFit.cover,
                     ),
                   ),
@@ -178,7 +183,9 @@ class _PlayerVideoAndPopPageState extends State<_PlayerVideoAndPopPage> {
     super.initState();
 
     _videoPlayerController = VideoPlayerController.networkUrl(
-        Uri.parse('https://flutter.github.io/assets-for-api-docs/assets/videos/bee.mp4'));
+      Uri.parse('https://flutter.github.io/assets-for-api-docs/assets/videos/bee.mp4'),
+    );
+
     _videoPlayerController.addListener(() {
       if (startedPlaying && !_videoPlayerController.value.isPlaying) {
         if (mounted) {

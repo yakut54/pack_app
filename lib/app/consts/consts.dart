@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 class FontFamily {
   static const regularFont = 'AkrobatRegular';
   static const semiFont = 'AkrobatSemibold';
+  static const extraboldFont = 'AkrobatExtrabold';
 }
 
 class AppColors {
@@ -11,4 +12,5 @@ class AppColors {
   static const mainColor = Color(0xFFF1F3FF);
   static const btnColor = Color.fromARGB(255, 80, 80, 83);
   static const playerColor = Color.fromARGB(132, 137, 244, 248);
+  static const prloaderColor = Color.fromARGB(132, 15, 166, 172);
 }

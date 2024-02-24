@@ -2,11 +2,17 @@
 import 'package:audioplayers/audioplayers.dart';
 import 'package:flutter/material.dart';
 import 'package:pack_app/app/screens/Audio/audio_file.dart';
-import '/app/router/export.dart';
+import '/app/imports/all_imports.dart';
 
 class AudioScreen extends StatefulWidget {
   final Session session;
-  const AudioScreen({super.key, required this.session});
+  final bool isFileExists;
+
+  const AudioScreen({
+    super.key,
+    required this.session,
+    required this.isFileExists,
+  });
 
   @override
   State<AudioScreen> createState() => _AudioScreenState();
@@ -53,7 +59,7 @@ class _AudioScreenState extends State<AudioScreen> {
                           decoration: BoxDecoration(
                             shape: BoxShape.circle,
                             image: DecorationImage(
-                              image: NetworkImage(widget.session.sessionImg),
+                              image: NetworkImage(widget.session.trackImg),
                               fit: BoxFit.cover,
                             ),
                           ),
@@ -79,6 +85,7 @@ class _AudioScreenState extends State<AudioScreen> {
                           child: Player(
                             player: player,
                             session: widget.session,
+                            isFileExists: widget.isFileExists,
                           ),
                         )
                       ],
