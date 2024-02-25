@@ -13,7 +13,7 @@ class FileApi extends ChangeNotifier {
     return defaultValue;
   }
 
-  String getFileName(String track) => getFileInfo(track, RegExp(r'\/([^\/]+)\.(mp3|mp4)$'), 'file_name');
+  String getFileName(String track) => getFileInfo(track, RegExp(r'\/([^\/]+)\.(mp3|mp4|png|jpg|jpeg)$'), 'file_name');
 
   String getFileExtension(String track) => getFileInfo(track, RegExp(r'\.([a-zA-Z0-9]+)$'), 'mp3');
 

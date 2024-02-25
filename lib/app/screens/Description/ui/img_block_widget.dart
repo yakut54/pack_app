@@ -1,13 +1,26 @@
+import 'dart:io';
 import 'package:flutter/material.dart';
 import '/app/imports/all_imports.dart';
 
 class ImgBlockWidget extends StatelessWidget {
   const ImgBlockWidget({
-    super.key,
+    Key? key,
     required this.session,
-  });
+    required this.sessionImgPath,
+    required this.isSessionImgExists,
+  }) : super(key: key);
 
   final Session session;
+  final String sessionImgPath;
+  final bool isSessionImgExists;
+
+  pesda() {
+    if (isSessionImgExists) {
+      return FileImage(File(sessionImgPath));
+    } else {
+      return NetworkImage(session.sessionImg);
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -36,7 +49,7 @@ class ImgBlockWidget extends StatelessWidget {
                   decoration: BoxDecoration(
                     shape: BoxShape.circle,
                     image: DecorationImage(
-                      image: NetworkImage(session.sessionImg),
+                      image: pesda(),
                       fit: BoxFit.cover,
                     ),
                   ),
@@ -44,7 +57,7 @@ class ImgBlockWidget extends StatelessWidget {
               ),
             ),
             Text(
-              session.subscribe.trim().replaceAll("\\n", "\n"),
+              session.subscribe.trim().replaceAll(r"\n", "\n"),
               textAlign: TextAlign.center,
               style: const TextStyle(
                 fontFamily: FontFamily.regularFont,

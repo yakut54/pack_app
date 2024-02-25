@@ -74,8 +74,8 @@ class _TextDescriptionWidgetState extends State<TextDescriptionWidget> {
       color: Colors.white.withOpacity(0.8),
       padding: const EdgeInsets.all(0.0),
       child: Column(children: [
-        htmlRecomendation,
         htmlDescription,
+        htmlRecomendation,
       ]),
     );
   }

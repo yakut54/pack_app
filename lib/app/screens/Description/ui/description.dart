@@ -1,5 +1,8 @@
+import 'dart:async';
+import 'dart:io';
+
+import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_html/flutter_html.dart';
 import '/app/imports/all_imports.dart';
 
 class Description extends StatefulWidget {
@@ -13,7 +16,9 @@ class Description extends StatefulWidget {
 class _DescriptionState extends State<Description> {
   Session get session => widget.session;
   bool isFileExists = true;
+  bool isSessionImgExists = true;
   String filePath = '';
+  String sessionImgPath = '';
 
   void toggleFileExists() async {
     filePath = await FileApi().getFilePath(session.track);
@@ -21,10 +26,53 @@ class _DescriptionState extends State<Description> {
     setState(() {});
   }
 
+  void toggleIsSessionImg() {
+    FileApi().getFilePath(session.sessionImg).then((value) {
+      sessionImgPath = value;
+      isSessionImgExists = FileApi.isFileExists(sessionImgPath);
+
+      if (!isSessionImgExists) {
+        Dio dio = Dio();
+
+        try {
+          dio.download(
+            session.sessionImg,
+            sessionImgPath,
+          );
+        } catch (e) {
+          print('Произошла ошибка при загрузке файла: $e');
+        }
+      }
+      setState(() {});
+    });
+  }
+
+  Future<List<File>> getDownloadedFiles() async {
+    Directory directory = await appDocumentDir();
+
+    List<File> files = directory
+        .listSync(
+          recursive: true,
+          followLinks: false,
+        )
+        .where((file) =>
+            file.path.endsWith('.mp3') ||
+            file.path.endsWith('.mp4') ||
+            file.path.endsWith('.png') ||
+            file.path.endsWith('.jpg') ||
+            file.path.endsWith('.jpeg'))
+        .map((file) => File(file.path))
+        .toList();
+
+    return files;
+  }
+
   @override
   void initState() {
     super.initState();
     toggleFileExists();
+    toggleIsSessionImg();
+    getDownloadedFiles().then((value) => print(value));
   }
 
   @override
@@ -58,7 +106,11 @@ class _DescriptionState extends State<Description> {
                   children: [
                     Column(
                       children: [
-                        ImgBlockWidget(session: session),
+                        ImgBlockWidget(
+                          session: session,
+                          sessionImgPath: sessionImgPath,
+                          isSessionImgExists: isSessionImgExists,
+                        ),
                         const SizedBox(height: 15),
                         TextDescriptionWidget(session: session),
                         const SizedBox(height: 10),
@@ -171,7 +223,11 @@ class _DescriptionState extends State<Description> {
 
   Widget _controllerRouteWidget(isFileExists) {
     if (session.type == 'audio') {
-      return AudioScreen(session: session, isFileExists: isFileExists);
+      return AudioScreen(
+        session: session,
+        isFileExists: isFileExists,
+        filePath: filePath,
+      );
     } else {
       return VideoScreen(session: session, isFileExists: isFileExists);
     }

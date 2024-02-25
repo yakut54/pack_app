@@ -1,5 +1,7 @@
-// import 'package:audioplayers/audioplayers.dart';
+import 'dart:io';
+
 import 'package:audioplayers/audioplayers.dart';
+import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
 import 'package:pack_app/app/screens/Audio/audio_file.dart';
 import '/app/imports/all_imports.dart';
@@ -7,11 +9,13 @@ import '/app/imports/all_imports.dart';
 class AudioScreen extends StatefulWidget {
   final Session session;
   final bool isFileExists;
+  final String filePath;
 
   const AudioScreen({
     super.key,
     required this.session,
     required this.isFileExists,
+    required this.filePath,
   });
 
   @override
@@ -20,6 +24,44 @@ class AudioScreen extends StatefulWidget {
 
 class _AudioScreenState extends State<AudioScreen> {
   final player = AudioPlayer();
+
+  bool isTrackImgExists = true;
+  String trackImgPath = '';
+
+  void toggleIsTrackImg() {
+    FileApi().getFilePath(widget.session.trackImg).then((value) {
+      trackImgPath = value;
+      isTrackImgExists = FileApi.isFileExists(trackImgPath);
+
+      if (!isTrackImgExists) {
+        Dio dio = Dio();
+
+        try {
+          dio.download(
+            widget.session.trackImg,
+            trackImgPath,
+          );
+        } catch (e) {
+          print('Произошла ошибка при загрузке файла: $e');
+        }
+      }
+      setState(() {});
+    });
+  }
+
+  pesda() {
+    if (isTrackImgExists) {
+      return FileImage(File(trackImgPath));
+    } else {
+      return NetworkImage(widget.session.trackImg);
+    }
+  }
+
+  @override
+  void initState() {
+    super.initState();
+    toggleIsTrackImg();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -59,7 +101,7 @@ class _AudioScreenState extends State<AudioScreen> {
                           decoration: BoxDecoration(
                             shape: BoxShape.circle,
                             image: DecorationImage(
-                              image: NetworkImage(widget.session.trackImg),
+                              image: pesda(),
                               fit: BoxFit.cover,
                             ),
                           ),
@@ -86,6 +128,7 @@ class _AudioScreenState extends State<AudioScreen> {
                             player: player,
                             session: widget.session,
                             isFileExists: widget.isFileExists,
+                            filePath: widget.filePath,
                           ),
                         )
                       ],
