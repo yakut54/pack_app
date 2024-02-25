@@ -1,13 +1,20 @@
 import 'package:audioplayers/audioplayers.dart';
 import 'package:flutter/material.dart';
-import 'package:pack_app/app/models/index.dart';
-import 'package:pack_app/app/router/export.dart';
+import '/app/imports/all_imports.dart';
 
 class Player extends StatefulWidget {
   final AudioPlayer player;
   final Session session;
+  final bool isFileExists;
+  final String filePath;
 
-  const Player({Key? key, required this.player, required this.session}) : super(key: key);
+  const Player({
+    Key? key,
+    required this.player,
+    required this.session,
+    required this.isFileExists,
+    required this.filePath,
+  }) : super(key: key);
 
   @override
   State<Player> createState() => _PlayerState();
@@ -17,28 +24,34 @@ class _PlayerState extends State<Player> {
   final List<IconData> _icons = [Icons.play_circle_fill, Icons.pause_circle_filled];
   Duration _duration = const Duration();
   Duration _position = const Duration();
+
   bool isPlaying = false;
   bool isRepeat = false;
   bool isShowZaglushka = true;
 
+  void setFile() {
+    if (widget.isFileExists) {
+      widget.player.setSourceDeviceFile(widget.filePath);
+    } else {
+      widget.player.setSourceUrl(widget.session.track);
+    }
+  }
+
   @override
   void initState() {
     super.initState();
-
-    widget.player.setSourceUrl(widget.session.track);
+    setFile();
 
     widget.player.onDurationChanged.listen((Duration d) {
       setState(() {
         isShowZaglushka = false;
         _duration = d;
-        print('_duration => $_duration');
       });
     });
 
     widget.player.onPositionChanged.listen((Duration p) {
       setState(() {
         _position = p;
-        print('_position => $_position');
       });
     });
   }
@@ -76,7 +89,13 @@ class _PlayerState extends State<Player> {
         : IconButton(
             padding: const EdgeInsets.only(bottom: 10),
             onPressed: () {
-              isPlaying ? widget.player.pause() : widget.player.play(UrlSource(widget.session.track));
+              print(widget.isFileExists ? 'Запуск с файла' : 'Запуск с интернета');
+
+              isPlaying
+                  ? widget.player.pause()
+                  : widget.player.play(
+                      widget.isFileExists ? DeviceFileSource(widget.filePath) : UrlSource(widget.session.track),
+                    );
               isPlaying = !isPlaying;
               widget.player.setPlaybackRate(1.0);
               setState(() {});
@@ -91,10 +110,12 @@ class _PlayerState extends State<Player> {
 
   @override
   Widget build(BuildContext context) {
-    return WillPopScope(
-      onWillPop: () async {
-        widget.player.stop();
-        return true;
+    return PopScope(
+      canPop: true,
+      onPopInvoked: (didPop) {
+        if (didPop) {
+          widget.player.stop();
+        }
       },
       child: Container(
         margin: const EdgeInsets.only(top: 20),
@@ -121,13 +142,14 @@ class _PlayerState extends State<Player> {
             Row(
               children: [slider()],
             ),
-            Row(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [Expanded(child: Text(widget.session.track))],
-            )
           ],
         ),
       ),
     );
+  }
+
+  @override
+  void dispose() {
+    super.dispose();
   }
 }

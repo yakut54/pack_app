@@ -20,6 +20,9 @@ dependencies:
   path_provider: ^2.1.2
   dio: ^5.4.0
   http: ^1.1.0
+  hive: ^2.2.3
+  provider: ^6.1.1
+  flutter_html: ^3.0.0-alpha.5
 
 dev_dependencies:
   flutter_test:
@@ -42,3 +45,6 @@ flutter:
     - family: AkrobatSemibold
       fonts:
       - asset: assets/fonts/akrobat-semibold.otf
+    - family: AkrobatExtrabold
+      fonts:
+      - asset: assets/fonts/akrobat-extrabold.otf

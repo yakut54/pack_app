@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:get_it/get_it.dart';
 import 'package:pack_app/app/bloc/pack_bloc.dart';
-import '/app/router/export.dart';
+import '/app/imports/all_imports.dart';
 import 'list_tile_widget.dart';
 
 class Menu extends StatefulWidget {
@@ -33,7 +33,7 @@ class _MenuState extends State<Menu> {
   void initState() {
     super.initState();
 
-    _checkConnect().then((value) => print('Connect $value'));
+    // _checkConnect().then((value) => print('Connect $value'));
     if (isPhone) {
       _readData();
     }
@@ -63,12 +63,14 @@ class _MenuState extends State<Menu> {
                       backgroundImg: state is PackLoaded ? state.pack.backgroundImg : 'bg_01',
                     ),
                   if (state is! PackLoaded)
+                    // if (pack == null)
                     const Text('...Загрузка')
                   else
                     ListView.builder(
                       physics: const NeverScrollableScrollPhysics(),
                       scrollDirection: Axis.vertical,
                       shrinkWrap: true,
+                      // itemCount: pack!.sessions.length,
                       itemCount: isPhone ? pack!.sessions.length : state.pack.sessions.length,
                       itemBuilder: (BuildContext context, int index) {
                         return LayoutBuilder(builder: (context, constraints) {
@@ -101,6 +103,7 @@ class _MenuState extends State<Menu> {
                                 child: ListTileWidget(
                                   width: width,
                                   sessions: isPhone ? pack!.sessions : state.pack.sessions,
+                                  // sessions: pack!.sessions,
                                   index: index,
                                 ),
                               ),
