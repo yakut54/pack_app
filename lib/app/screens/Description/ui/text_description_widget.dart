@@ -19,7 +19,7 @@ class _TextDescriptionWidgetState extends State<TextDescriptionWidget> {
   late Widget htmlRecomendation;
 
   get recomendation =>
-      '<strong>Рекомендации:</strong> ${widget.session.recomendation == '' ? '<br>Сеанс принимай в наушниках. <span style="color: red;">Это важно</span>.' : widget.session.recomendation}';
+      '<strong>Рекомендации:</strong> ${widget.session.recomendation == '' ? '<br>Сеанс принимай в наушниках. <span style="color: red;">Это важно</span>.' : '<br>${widget.session.recomendation}'}';
 
   initHtml() {
     htmlDescription = Html(
@@ -55,6 +55,9 @@ class _TextDescriptionWidgetState extends State<TextDescriptionWidget> {
         ),
         'span': Style(
           textDecoration: TextDecoration.underline,
+        ),
+        'strong': Style(
+          fontFamily: FontFamily.extraboldFont,
         )
       },
     );
@@ -62,7 +65,6 @@ class _TextDescriptionWidgetState extends State<TextDescriptionWidget> {
 
   @override
   void initState() {
-    // TODO: implement initState
     super.initState();
     initHtml();
   }
@@ -75,7 +77,22 @@ class _TextDescriptionWidgetState extends State<TextDescriptionWidget> {
       padding: const EdgeInsets.all(0.0),
       child: Column(children: [
         htmlDescription,
-        htmlRecomendation,
+        Container(
+          padding: const EdgeInsets.all(6),
+          margin: const EdgeInsets.only(top: 6, bottom: 16),
+          decoration: BoxDecoration(
+            color: AppColors.darkColor,
+            borderRadius: BorderRadius.circular(6),
+            boxShadow: [
+              BoxShadow(
+                color: Colors.black.withOpacity(0.47),
+                blurRadius: 4,
+                offset: const Offset(2, 3),
+              ),
+            ],
+          ),
+          child: htmlRecomendation,
+        )
       ]),
     );
   }

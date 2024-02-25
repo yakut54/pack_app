@@ -49,7 +49,7 @@ class _AudioScreenState extends State<AudioScreen> {
     });
   }
 
-  pesda() {
+  dynamic getFileTrack() {
     if (isTrackImgExists) {
       return FileImage(File(trackImgPath));
     } else {
@@ -101,7 +101,7 @@ class _AudioScreenState extends State<AudioScreen> {
                           decoration: BoxDecoration(
                             shape: BoxShape.circle,
                             image: DecorationImage(
-                              image: pesda(),
+                              image: getFileTrack(),
                               fit: BoxFit.cover,
                             ),
                           ),

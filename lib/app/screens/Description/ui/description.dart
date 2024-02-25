@@ -118,7 +118,7 @@ class _DescriptionState extends State<Description> {
                           onPressed: () {
                             Navigator.push(
                               context,
-                              MaterialPageRoute(builder: (context) => _controllerRouteWidget(isFileExists)),
+                              MaterialPageRoute(builder: (context) => _controllerRouteWidget()),
                             );
                           },
                           style: ButtonStyle(
@@ -221,7 +221,7 @@ class _DescriptionState extends State<Description> {
     );
   }
 
-  Widget _controllerRouteWidget(isFileExists) {
+  Widget _controllerRouteWidget() {
     if (session.type == 'audio') {
       return AudioScreen(
         session: session,
@@ -229,7 +229,11 @@ class _DescriptionState extends State<Description> {
         filePath: filePath,
       );
     } else {
-      return VideoScreen(session: session, isFileExists: isFileExists);
+      return VideoScreen(
+        session: session,
+        isFileExists: isFileExists,
+        filePath: filePath,
+      );
     }
   }
 }

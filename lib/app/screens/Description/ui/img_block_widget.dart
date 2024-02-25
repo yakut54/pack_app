@@ -14,7 +14,7 @@ class ImgBlockWidget extends StatelessWidget {
   final String sessionImgPath;
   final bool isSessionImgExists;
 
-  pesda() {
+  getFileTrack() {
     if (isSessionImgExists) {
       return FileImage(File(sessionImgPath));
     } else {
@@ -49,7 +49,7 @@ class ImgBlockWidget extends StatelessWidget {
                   decoration: BoxDecoration(
                     shape: BoxShape.circle,
                     image: DecorationImage(
-                      image: pesda(),
+                      image: getFileTrack(),
                       fit: BoxFit.cover,
                     ),
                   ),
