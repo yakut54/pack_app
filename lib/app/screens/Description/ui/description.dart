@@ -3,6 +3,7 @@ import 'dart:io';
 
 import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
+import 'package:pack_app/app/widgets/button.dart';
 import '/app/imports/all_imports.dart';
 
 class Description extends StatefulWidget {
@@ -73,6 +74,7 @@ class _DescriptionState extends State<Description> {
     toggleFileExists();
     toggleIsSessionImg();
     getDownloadedFiles().then((value) => print(value));
+    setState(() {});
   }
 
   @override
@@ -114,110 +116,37 @@ class _DescriptionState extends State<Description> {
                         const SizedBox(height: 15),
                         TextDescriptionWidget(session: session),
                         const SizedBox(height: 10),
-                        ElevatedButton(
-                          onPressed: () {
+                        YButton(
+                          title: 'НАЧАТЬ',
+                          onTap: () {
                             Navigator.push(
                               context,
                               MaterialPageRoute(builder: (context) => _controllerRouteWidget()),
                             );
                           },
-                          style: ButtonStyle(
-                            padding: MaterialStateProperty.all<EdgeInsets>(
-                              const EdgeInsets.symmetric(
-                                vertical: 4,
-                                horizontal: 15,
-                              ),
-                            ),
-                            backgroundColor: MaterialStateProperty.all<Color>(Colors.transparent),
-                            elevation: MaterialStateProperty.all<double>(0),
-                            shadowColor: MaterialStateProperty.all<Color>(Colors.transparent),
-                            shape: MaterialStateProperty.all<RoundedRectangleBorder>(
-                              RoundedRectangleBorder(
-                                borderRadius: BorderRadius.circular(10),
-                              ),
-                            ),
-                          ),
-                          child: Container(
-                            decoration: BoxDecoration(
-                              gradient: const LinearGradient(
-                                begin: Alignment.topLeft,
-                                end: Alignment.bottomRight,
-                                colors: [
-                                  Color(0xffFF8700),
-                                  Color(0xffF8C740),
-                                  Color(0xffFF8700),
-                                ],
-                                stops: [0.0, 0.56, 1.04],
-                                transform: GradientRotation(135 * 3.14 / 180),
-                              ),
-                              boxShadow: [
-                                BoxShadow(
-                                  color: Colors.black.withOpacity(0.5),
-                                  offset: const Offset(2, 2),
-                                  blurRadius: 3,
-                                ),
-                              ],
-                              borderRadius: BorderRadius.circular(10),
-                            ),
-                            child: Container(
-                              constraints: const BoxConstraints(maxWidth: 220),
-                              alignment: Alignment.center,
-                              child: const Text(
-                                'НАЧАТЬ',
-                                style: TextStyle(
-                                  fontFamily: FontFamily.regularFont,
-                                  fontSize: 24,
-                                  letterSpacing: 6,
-                                  height: 2,
-                                  color: Colors.black,
-                                ),
-                              ),
-                            ),
-                          ),
                         ),
+                        const SizedBox(height: 15),
                       ],
                     ),
-                    isFileExists
-                        ? const SizedBox()
-                        : Positioned(
-                            right: 0,
-                            child: Container(
-                              decoration: const BoxDecoration(
-                                color: Color.fromARGB(255, 2, 52, 99),
-                                shape: BoxShape.circle,
-                              ),
-                              child: IconButton(
-                                padding: const EdgeInsets.all(0.0),
-                                iconSize: 40,
-                                icon: const Icon(
-                                  Icons.download_for_offline_outlined,
-                                ),
-                                onPressed: () {
-                                  showDialog(
-                                    barrierDismissible: false,
-                                    context: context,
-                                    builder: (BuildContext context) {
-                                      return PopupDialog(
-                                        filePath: filePath,
-                                        session: session,
-                                      );
-                                    },
-                                  ).then((value) {
-                                    toggleFileExists();
-                                  });
-                                },
-                                color: AppColors.mainColor,
-                              ),
-                            ),
-                          )
+                    const SizedBox(height: 15),
                   ],
                 ),
               ),
-              const SizedBox(height: 15),
+              const SizedBox(height: 35),
             ],
           ),
         ),
       ),
+      floatingActionButton: FloatingActionButton(
+        backgroundColor: AppColors.backButtonColor,
+        onPressed: () => Navigator.pop(context),
+        child: const Icon(
+          color: AppColors.headerTitleColor,
+          size: 50,
+          Icons.keyboard_arrow_left,
+        ),
+      ),
+      floatingActionButtonLocation: FloatingActionButtonLocation.miniEndFloat,
     );
   }
 
@@ -225,13 +154,11 @@ class _DescriptionState extends State<Description> {
     if (session.type == 'audio') {
       return AudioScreen(
         session: session,
-        isFileExists: isFileExists,
         filePath: filePath,
       );
     } else {
       return VideoScreen(
         session: session,
-        isFileExists: isFileExists,
         filePath: filePath,
       );
     }

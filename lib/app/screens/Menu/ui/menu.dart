@@ -13,7 +13,7 @@ class Menu extends StatefulWidget {
 }
 
 class _MenuState extends State<Menu> {
-  final bool isPhone = false;
+  final bool isPhone = !false;
   final PackBloc _packBloc = PackBloc(GetIt.I<APackRepo>());
   Pack? pack;
 
@@ -62,16 +62,16 @@ class _MenuState extends State<Menu> {
                       packSubtitle: state is PackLoaded ? state.pack.subtitle : '...Loading',
                       backgroundImg: state is PackLoaded ? state.pack.backgroundImg : 'bg_01',
                     ),
-                  if (state is! PackLoaded)
-                    // if (pack == null)
+                  // if (state is! PackLoaded)
+                  if (pack == null)
                     const Text('...Загрузка')
                   else
                     ListView.builder(
                       physics: const NeverScrollableScrollPhysics(),
                       scrollDirection: Axis.vertical,
                       shrinkWrap: true,
-                      // itemCount: pack!.sessions.length,
-                      itemCount: isPhone ? pack!.sessions.length : state.pack.sessions.length,
+                      itemCount: pack!.sessions.length,
+                      // itemCount: isPhone ? pack!.sessions.length : state.pack.sessions.length,
                       itemBuilder: (BuildContext context, int index) {
                         return LayoutBuilder(builder: (context, constraints) {
                           double width = MediaQuery.of(context).size.width;
@@ -102,8 +102,8 @@ class _MenuState extends State<Menu> {
                                 ),
                                 child: ListTileWidget(
                                   width: width,
-                                  sessions: isPhone ? pack!.sessions : state.pack.sessions,
-                                  // sessions: pack!.sessions,
+                                  // sessions: isPhone ? pack!.sessions : state.pack.sessions,
+                                  sessions: pack!.sessions,
                                   index: index,
                                 ),
                               ),

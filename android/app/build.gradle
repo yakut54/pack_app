@@ -54,9 +54,12 @@ android {
 
     buildTypes {
         release {
-            // TODO: Add your own signing config for the release build.
-            // Signing with the debug keys for now, so `flutter run --release` works.
             signingConfig signingConfigs.debug
+            applicationVariants.all { variant ->
+                variant.outputs.all {
+                    outputFileName = "yabloko.apk"  // как сгенерировать имя файла
+                }
+            }
         }
     }
 }

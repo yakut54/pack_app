@@ -4,13 +4,11 @@ import '/app/imports/all_imports.dart';
 
 class VideoScreen extends StatefulWidget {
   final Session session;
-  final bool isFileExists;
   final String filePath;
 
   const VideoScreen({
     super.key,
     required this.session,
-    required this.isFileExists,
     required this.filePath,
   });
 
@@ -21,6 +19,12 @@ class VideoScreen extends StatefulWidget {
 class _VideoScreenState extends State<VideoScreen> {
   bool isTrackImgExists = true;
   String trackImgPath = '';
+  late bool isFileExists;
+
+  void toggleFileExists() async {
+    isFileExists = FileApi.isFileExists(widget.filePath);
+    setState(() {});
+  }
 
   void toggleIsTrackImg() {
     FileApi().getFilePath(widget.session.trackImg).then((value) {
@@ -43,15 +47,41 @@ class _VideoScreenState extends State<VideoScreen> {
     });
   }
 
+  openShowDialog() {
+    showDialog(
+      barrierDismissible: false,
+      context: context,
+      builder: (BuildContext context) {
+        return PopupDialog(
+          filePath: widget.filePath,
+          session: widget.session,
+        );
+      },
+    ).then((value) {
+      toggleFileExists();
+    });
+  }
+
   @override
   void initState() {
     super.initState();
     toggleIsTrackImg();
+    toggleFileExists();
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      floatingActionButton: FloatingActionButton(
+        backgroundColor: AppColors.backButtonColor,
+        onPressed: () => Navigator.pop(context),
+        child: const Icon(
+          color: AppColors.headerTitleColor,
+          size: 50,
+          Icons.keyboard_arrow_left,
+        ),
+      ),
+      floatingActionButtonLocation: FloatingActionButtonLocation.endFloat,
       body: SafeArea(
         bottom: false,
         child: SingleChildScrollView(
@@ -90,16 +120,21 @@ class _VideoScreenState extends State<VideoScreen> {
                     ),
                     VideoFile(
                       session: widget.session,
-                      isFileExists: widget.isFileExists,
+                      isFileExists: isFileExists,
                       filePath: widget.filePath,
                       isTrackImgExists: isTrackImgExists,
                       trackImgPath: trackImgPath,
                     ),
+                    const SizedBox(height: 15),
+                    if (!isFileExists)
+                      YButton(
+                        title: 'СКАЧАТЬ',
+                        onTap: openShowDialog,
+                      ),
                   ],
                 ),
               ),
             ),
-            const SizedBox(height: 15),
           ],
         )),
       ),

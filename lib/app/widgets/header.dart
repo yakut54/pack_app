@@ -91,7 +91,7 @@ class Header extends StatelessWidget {
                                         fontFamily: FontFamily.semiFont,
                                         fontSize: responsiveSizes.fontSizeHeaderLarge,
                                         height: 1,
-                                        color: const Color(0xFFC09D52)),
+                                        color: AppColors.headerTitleColor),
                                   ),
                                   Text(
                                     packSubtitle.trim().replaceAll("\\n", "\n"),

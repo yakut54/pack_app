@@ -4,17 +4,16 @@ import 'package:audioplayers/audioplayers.dart';
 import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
 import 'package:pack_app/app/screens/Audio/audio_file.dart';
+import 'package:pack_app/app/widgets/button.dart';
 import '/app/imports/all_imports.dart';
 
 class AudioScreen extends StatefulWidget {
   final Session session;
-  final bool isFileExists;
   final String filePath;
 
   const AudioScreen({
     super.key,
     required this.session,
-    required this.isFileExists,
     required this.filePath,
   });
 
@@ -27,6 +26,12 @@ class _AudioScreenState extends State<AudioScreen> {
 
   bool isTrackImgExists = true;
   String trackImgPath = '';
+  late bool isFileExists;
+
+  void toggleFileExists() async {
+    isFileExists = FileApi.isFileExists(widget.filePath);
+    setState(() {});
+  }
 
   void toggleIsTrackImg() {
     FileApi().getFilePath(widget.session.trackImg).then((value) {
@@ -57,15 +62,42 @@ class _AudioScreenState extends State<AudioScreen> {
     }
   }
 
+  openShowDialog() {
+    showDialog(
+      barrierDismissible: false,
+      context: context,
+      builder: (BuildContext context) {
+        return PopupDialog(
+          filePath: widget.filePath,
+          session: widget.session,
+        );
+      },
+    ).then((value) {
+      toggleFileExists();
+    });
+  }
+
   @override
   void initState() {
     super.initState();
     toggleIsTrackImg();
+    toggleFileExists();
+    setState(() {});
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      floatingActionButton: FloatingActionButton(
+        backgroundColor: AppColors.backButtonColor,
+        onPressed: () => Navigator.pop(context),
+        child: const Icon(
+          color: AppColors.headerTitleColor,
+          size: 50,
+          Icons.keyboard_arrow_left,
+        ),
+      ),
+      floatingActionButtonLocation: FloatingActionButtonLocation.endFloat,
       body: SafeArea(
         bottom: false,
         child: SingleChildScrollView(
@@ -127,10 +159,15 @@ class _AudioScreenState extends State<AudioScreen> {
                           child: Player(
                             player: player,
                             session: widget.session,
-                            isFileExists: widget.isFileExists,
+                            isFileExists: isFileExists,
                             filePath: widget.filePath,
                           ),
-                        )
+                        ),
+                        if (!isFileExists)
+                          YButton(
+                            title: 'СКАЧАТЬ',
+                            onTap: openShowDialog,
+                          ),
                       ],
                     ),
                   ],
@@ -142,5 +179,11 @@ class _AudioScreenState extends State<AudioScreen> {
         )),
       ),
     );
+  }
+
+  @override
+  void didUpdateWidget(covariant AudioScreen oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    print('MyWidget перерендерился');
   }
 }
