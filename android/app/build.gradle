@@ -55,22 +55,23 @@ android {
     buildTypes {
         release {
             signingConfig signingConfigs.debug
-            applicationVariants.all { variant ->
-                variant.outputs.all {
-                    outputFileName = "yabloko.apk"
-                }
-            }
         }
     }
 
     flavorDimensions "version"
 
-    productFlavors {
+    productFlavors { 
         yabloko {
             dimension "version"
             applicationId "com.example.yabloko"
             versionCode 1
             versionName "1.0"
+            android.applicationVariants.all { variant ->
+                variant.outputs.all {
+                    def variantNameWithoutType = variant.name.replace("Debug", "").replace("Release", "").replace("Profile", "")
+                    outputFileName = "pack-${variantNameWithoutType}.apk"
+                }
+            }
         }
     }
 }
