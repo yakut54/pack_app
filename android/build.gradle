@@ -30,17 +30,3 @@ tasks.register("clean", Delete) {
     delete rootProject.buildDir
 }
 
-android {
-    flavorDimensions "default"
-
-    productFlavors {
-        flavor1 {
-            dimension "default"
-            // Настройки для flavor1
-        }
-        flavor2 {
-            dimension "default"
-            // Настройки для flavor2
-        }
-    }
-}
