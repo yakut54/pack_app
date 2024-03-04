@@ -57,34 +57,20 @@ android {
             signingConfig signingConfigs.debug
             applicationVariants.all { variant ->
                 variant.outputs.all {
-                    outputFileName = "yabloko.apk"  // как сгенерировать имя файла
+                    outputFileName = "yabloko.apk"
                 }
             }
         }
     }
 
-    // Указываем измерение для вкусов
     flavorDimensions "version"
 
-    // Определяем различные вкусы (flavors)
     productFlavors {
-        // Первый вкус
-        flavor1 {
-            dimension "version" // Указываем измерение, к которому принадлежит этот вкус
-            applicationId "com.example.flavor1" // Уникальный идентификатор пакета для этого вкуса
-            versionCode 1 // Уникальный код версии для этого вкуса
-            versionName "1.0" // Имя версии для этого вкуса
-            resValue "string", "huj", "Flavor 1 App" // Настройка имени приложения для этого вкуса
-            // Другие настройки для flavor1
-        }
-        // Второй вкус
-        flavor2 {
-            dimension "version" // Указываем измерение, к которому принадлежит этот вкус
-            applicationId "com.example.flavor2" // Уникальный идентификатор пакета для этого вкуса
-            versionCode 2 // Уникальный код версии для этого вкуса
-            versionName "2.0" // Имя версии для этого вкуса
-            resValue "string", "pesda", "Flavor 2 App" // Настройка имени приложения для этого вкуса
-            // Другие настройки для flavor2
+        yabloko {
+            dimension "version"
+            applicationId "com.example.yabloko"
+            versionCode 1
+            versionName "1.0"
         }
     }
 }
