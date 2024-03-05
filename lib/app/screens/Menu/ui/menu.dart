@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:get_it/get_it.dart';
@@ -13,9 +14,10 @@ class Menu extends StatefulWidget {
 }
 
 class _MenuState extends State<Menu> {
-  final bool isPhone = !false;
+  final bool isPhone = true;
   final PackBloc _packBloc = PackBloc(GetIt.I<APackRepo>());
   Pack? pack;
+  bool isStarted = false;
 
   Future<bool> _checkConnect() async {
     bool b = await connectivity();
@@ -33,11 +35,27 @@ class _MenuState extends State<Menu> {
   void initState() {
     super.initState();
 
-    // _checkConnect().then((value) => print('Connect $value'));
+    _checkConnect().then((value) => print('Connect $value'));
+
     if (isPhone) {
       _readData();
+    } else {
+      _packBloc.add(LoadPack());
     }
-    _packBloc.add(LoadPack());
+
+    // _packBloc.add(LoadPack());
+  }
+
+  @override
+  void didChangeDependencies() async {
+    super.didChangeDependencies();
+
+    if (!isStarted) {
+      Timer(const Duration(seconds: 5), () {
+        isStarted = true;
+        setState(() {});
+      });
+    }
   }
 
   @override
@@ -48,72 +66,69 @@ class _MenuState extends State<Menu> {
           child: BlocBuilder<PackBloc, PackState>(
             bloc: _packBloc,
             builder: (context, state) {
-              return Column(
-                children: [
-                  if (isPhone)
-                    Header(
-                      packTitle: pack != null ? pack!.title : '...Loading',
-                      packSubtitle: pack != null ? pack!.subtitle : '...Loading',
-                      backgroundImg: pack != null ? pack!.backgroundImg : 'bg_01',
-                    )
-                  else
-                    Header(
-                      packTitle: state is PackLoaded ? state.pack.title : '...Loading',
-                      packSubtitle: state is PackLoaded ? state.pack.subtitle : '...Loading',
-                      backgroundImg: state is PackLoaded ? state.pack.backgroundImg : 'bg_01',
-                    ),
-                  // if (state is! PackLoaded)
-                  if (pack == null)
-                    const Text('...Загрузка')
-                  else
-                    ListView.builder(
-                      physics: const NeverScrollableScrollPhysics(),
-                      scrollDirection: Axis.vertical,
-                      shrinkWrap: true,
-                      itemCount: pack!.sessions.length,
-                      // itemCount: isPhone ? pack!.sessions.length : state.pack.sessions.length,
-                      itemBuilder: (BuildContext context, int index) {
-                        return LayoutBuilder(builder: (context, constraints) {
-                          double width = MediaQuery.of(context).size.width;
+              // return state is PackLoaded && isStarted
+              return pack != null && isStarted
+                  ? Column(
+                      children: [
+                        Header(
+                          packTitle: pack != null ? pack!.title : '...Loading',
+                          packSubtitle: pack != null ? pack!.subtitle : '...Loading',
+                          backgroundImg: pack != null ? pack!.backgroundImg : 'bg_01',
+                        ),
+                        // Header(
+                        //   packTitle: state.pack.title,
+                        //   packSubtitle: state.pack.subtitle,
+                        //   backgroundImg: state.pack.backgroundImg,
+                        // ),
+                        ListView.builder(
+                          physics: const NeverScrollableScrollPhysics(),
+                          scrollDirection: Axis.vertical,
+                          shrinkWrap: true,
+                          itemCount: pack!.sessions.length,
+                          // itemCount: state.pack.sessions.length,
+                          itemBuilder: (BuildContext context, int index) {
+                            return LayoutBuilder(builder: (context, constraints) {
+                              double width = MediaQuery.of(context).size.width;
 
-                          return Padding(
-                            padding: const EdgeInsets.symmetric(
-                              horizontal: 5,
-                              vertical: 3,
-                            ),
-                            child: Container(
-                              alignment: Alignment.center,
-                              child: Container(
-                                width: double.infinity,
-                                constraints: const BoxConstraints(
-                                  maxWidth: 800,
-                                  minHeight: 80,
+                              return Padding(
+                                padding: const EdgeInsets.symmetric(
+                                  horizontal: 5,
+                                  vertical: 3,
                                 ),
-                                alignment: Alignment.center,
-                                decoration: BoxDecoration(
-                                  color: const Color(0xFFF1F3FF),
-                                  boxShadow: [
-                                    BoxShadow(
-                                      color: Colors.black.withOpacity(0.47),
-                                      blurRadius: 2,
-                                      offset: const Offset(2, 2),
+                                child: Container(
+                                  alignment: Alignment.center,
+                                  child: Container(
+                                    width: double.infinity,
+                                    constraints: const BoxConstraints(
+                                      maxWidth: 800,
+                                      minHeight: 80,
                                     ),
-                                  ],
+                                    alignment: Alignment.center,
+                                    decoration: BoxDecoration(
+                                      color: const Color(0xFFF1F3FF),
+                                      boxShadow: [
+                                        BoxShadow(
+                                          color: Colors.black.withOpacity(0.47),
+                                          blurRadius: 2,
+                                          offset: const Offset(2, 2),
+                                        ),
+                                      ],
+                                    ),
+                                    child: ListTileWidget(
+                                      width: width,
+                                      // sessions: state.pack.sessions,
+                                      sessions: pack!.sessions,
+                                      index: index,
+                                    ),
+                                  ),
                                 ),
-                                child: ListTileWidget(
-                                  width: width,
-                                  // sessions: isPhone ? pack!.sessions : state.pack.sessions,
-                                  sessions: pack!.sessions,
-                                  index: index,
-                                ),
-                              ),
-                            ),
-                          );
-                        });
-                      },
-                    ),
-                ],
-              );
+                              );
+                            });
+                          },
+                        ),
+                      ],
+                    )
+                  : const SplashScreen();
             },
           ),
         ),

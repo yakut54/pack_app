@@ -73,7 +73,14 @@ android {
                 }
             }
         }
+        dev {
+            dimension "version"
+            applicationId "com.example.dev"
+            versionCode 1
+            versionName "1.0"
+        }
     }
+
 }
 
 flutter {

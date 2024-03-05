@@ -13,6 +13,8 @@ class PackRepo implements APackRepo {
     final Map<String, dynamic> jsonData = response.data;
 
     if (response.statusCode == 200) {
+      print('getPackWrapper');
+
       return getPack(jsonData);
     } else {
       throw Exception('Failed to load pack');
@@ -20,12 +22,16 @@ class PackRepo implements APackRepo {
   }
 
   @override
-  Future<Pack> getPacksFromJson(dynamic data) async {
+  Future<Pack> getPacksFromJson(String data) async {
     final response = data;
     final Map<String, dynamic> jsonData = jsonDecode(response);
+
+    print('getPacksFromJson');
+
     return getPack(jsonData);
   }
 
+  @override
   Pack getPack(Map<String, dynamic> jsonData) {
     final Map<String, dynamic> packWrapper = jsonData['packWrapper'];
     final List<dynamic> sessions = jsonData['sessionsList'];
