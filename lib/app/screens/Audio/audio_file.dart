@@ -82,15 +82,13 @@ class _PlayerState extends State<Player> {
   Widget btnStart(isShowZaglushka) {
     return isShowZaglushka
         ? const Icon(
-            Icons.lock_clock,
+            Icons.hourglass_empty,
             color: AppColors.btnColor,
-            size: 80,
+            size: 50,
           )
         : IconButton(
             padding: const EdgeInsets.only(bottom: 10),
             onPressed: () {
-              print(widget.isFileExists ? 'Запуск с файла' : 'Запуск с интернета');
-
               isPlaying
                   ? widget.player.pause()
                   : widget.player.play(
