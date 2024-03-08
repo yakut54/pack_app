@@ -1,14 +1,22 @@
+import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:video_player/video_player.dart';
-
-import '/app/router/export.dart';
+import '/app/imports/all_imports.dart';
 
 class VideoFile extends StatefulWidget {
   final Session session;
+  final bool isFileExists;
+  final String filePath;
+  final bool isTrackImgExists;
+  final String trackImgPath;
 
   const VideoFile({
     Key? key,
     required this.session,
+    required this.isFileExists,
+    required this.filePath,
+    required this.isTrackImgExists,
+    required this.trackImgPath,
   }) : super(key: key);
 
   @override
@@ -16,26 +24,34 @@ class VideoFile extends StatefulWidget {
 }
 
 class _VideoFileState extends State<VideoFile> {
-  late VideoPlayerController _controller;
+  late VideoPlayerController controller;
 
   @override
   void initState() {
     super.initState();
-    _controller = VideoPlayerController.networkUrl(
-      Uri.parse(widget.session.track),
-      videoPlayerOptions: VideoPlayerOptions(mixWithOthers: true),
-    );
 
-    _controller.addListener(() {
+    if (widget.isFileExists) {
+      controller = VideoPlayerController.file(
+        File(widget.filePath),
+        videoPlayerOptions: VideoPlayerOptions(mixWithOthers: true),
+      );
+    } else {
+      controller = VideoPlayerController.networkUrl(
+        Uri.parse(widget.session.track),
+        videoPlayerOptions: VideoPlayerOptions(mixWithOthers: true),
+      );
+    }
+
+    controller.addListener(() {
       setState(() {});
     });
-    _controller.setLooping(true);
-    _controller.initialize();
+    controller.setLooping(true);
+    controller.initialize();
   }
 
   @override
   void dispose() {
-    _controller.dispose();
+    controller.dispose();
     super.dispose();
   }
 
@@ -52,9 +68,17 @@ class _VideoFileState extends State<VideoFile> {
               child: Stack(
                 alignment: Alignment.bottomCenter,
                 children: [
-                  VideoPlayer(_controller),
-                  _ControlsOverlay(controller: _controller),
-                  VideoProgressIndicator(_controller, allowScrubbing: true),
+                  VideoPlayer(controller),
+                  _ControlsOverlay(
+                    controller: controller,
+                    session: widget.session,
+                    isTrackImgExists: widget.isTrackImgExists,
+                    trackImgPath: widget.trackImgPath,
+                    isFileExists: widget.isFileExists,
+                    filePath: widget.filePath,
+                    videoController: controller,
+                  ),
+                  VideoProgressIndicator(controller, allowScrubbing: true),
                 ],
               ),
             ),
@@ -66,7 +90,15 @@ class _VideoFileState extends State<VideoFile> {
 }
 
 class _ControlsOverlay extends StatelessWidget {
-  const _ControlsOverlay({required this.controller});
+  const _ControlsOverlay({
+    required this.controller,
+    required this.session,
+    required this.isTrackImgExists,
+    required this.trackImgPath,
+    required this.isFileExists,
+    required this.filePath,
+    required this.videoController,
+  });
 
   static const List<double> _examplePlaybackRates = <double>[
     0.25,
@@ -80,9 +112,25 @@ class _ControlsOverlay extends StatelessWidget {
   ];
 
   final VideoPlayerController controller;
+  final Session session;
+  final bool isFileExists;
+  final String filePath;
+  final bool isTrackImgExists;
+  final String trackImgPath;
+  final VideoPlayerController videoController;
+
+  dynamic getFileTrack() {
+    if (isTrackImgExists) {
+      return FileImage(File(trackImgPath));
+    } else {
+      return NetworkImage(session.trackImg);
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
+    print(getFileTrack());
+
     return Stack(
       children: [
         AnimatedSwitcher(
@@ -91,10 +139,9 @@ class _ControlsOverlay extends StatelessWidget {
           child: controller.value.isPlaying
               ? const SizedBox.shrink()
               : Container(
-                  decoration: const BoxDecoration(
+                  decoration: BoxDecoration(
                     image: DecorationImage(
-                      image: NetworkImage(
-                          'https://api.selcdn.ru/v1/SEL_53369/mng/receive/images/poster_while_for_life.jpg'),
+                      image: getFileTrack(),
                       fit: BoxFit.cover,
                     ),
                   ),
@@ -154,7 +201,18 @@ class _ControlsOverlay extends StatelessWidget {
               backgroundColor: AppColors.playerColor,
               child: IconButton(
                 icon: const Icon(Icons.open_in_new),
-                onPressed: () {},
+                onPressed: () {
+                  Navigator.push<_PlayerVideoAndPopPage>(
+                    context,
+                    MaterialPageRoute<_PlayerVideoAndPopPage>(
+                      builder: (BuildContext context) => _PlayerVideoAndPopPage(
+                        isFileExists: isFileExists,
+                        filePath: filePath,
+                        videoController: videoController,
+                      ),
+                    ),
+                  );
+                },
               ),
             ),
           ),
@@ -165,24 +223,30 @@ class _ControlsOverlay extends StatelessWidget {
 }
 
 class _PlayerVideoAndPopPage extends StatefulWidget {
+  final bool isFileExists;
+  final String filePath;
+  final VideoPlayerController videoController;
+
+  const _PlayerVideoAndPopPage({
+    required this.isFileExists,
+    required this.filePath,
+    required this.videoController,
+  });
+
   @override
   _PlayerVideoAndPopPageState createState() => _PlayerVideoAndPopPageState();
 }
 
 class _PlayerVideoAndPopPageState extends State<_PlayerVideoAndPopPage> {
-  late VideoPlayerController _videoPlayerController;
   bool startedPlaying = false;
 
   @override
   void initState() {
     super.initState();
 
-    _videoPlayerController = VideoPlayerController.networkUrl(
-        Uri.parse('https://flutter.github.io/assets-for-api-docs/assets/videos/bee.mp4'));
-    _videoPlayerController.addListener(() {
-      if (startedPlaying && !_videoPlayerController.value.isPlaying) {
+    widget.videoController.addListener(() {
+      if (startedPlaying && !widget.videoController.value.isPlaying) {
         if (mounted) {
-          print('test $mounted $context');
           Navigator.pop(context);
         }
       }
@@ -191,13 +255,10 @@ class _PlayerVideoAndPopPageState extends State<_PlayerVideoAndPopPage> {
 
   @override
   void dispose() {
-    _videoPlayerController.dispose();
     super.dispose();
   }
 
   Future<bool> started() async {
-    await _videoPlayerController.initialize();
-    await _videoPlayerController.play();
     startedPlaying = true;
     return true;
   }
@@ -211,8 +272,8 @@ class _PlayerVideoAndPopPageState extends State<_PlayerVideoAndPopPage> {
           builder: (BuildContext context, AsyncSnapshot<bool> snapshot) {
             if (snapshot.data ?? false) {
               return AspectRatio(
-                aspectRatio: _videoPlayerController.value.aspectRatio,
-                child: VideoPlayer(_videoPlayerController),
+                aspectRatio: widget.videoController.value.aspectRatio,
+                child: VideoPlayer(widget.videoController),
               );
             } else {
               return const Text('waiting for video to load');

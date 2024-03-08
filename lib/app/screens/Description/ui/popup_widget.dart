@@ -1,19 +1,16 @@
-import 'dart:io';
 import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
-import 'package:path_provider/path_provider.dart';
-import 'package:pack_app/app/router/export.dart';
+import 'package:provider/provider.dart';
+import '/app/imports/all_imports.dart';
 
 class PopupDialog extends StatefulWidget {
-  final String fileName;
+  final String filePath;
   final Session session;
-  final void Function() toggleParentFileExist;
 
   const PopupDialog({
     Key? key,
-    required this.fileName,
+    required this.filePath,
     required this.session,
-    required this.toggleParentFileExist,
   }) : super(key: key);
 
   @override
@@ -21,131 +18,250 @@ class PopupDialog extends StatefulWidget {
 }
 
 class PopupDialogState extends State<PopupDialog> {
-  bool _hideDialog = false;
-  bool _isLoading = false;
+  bool isCanPop = true;
+  bool isLoading = false;
+  bool isNotVisible = false;
+  double downloadProgress = 0;
 
-  void downloadFile(String savePath) async {
+  goToBack() => Navigator.of(context).pop();
+
+  Future<void> initDownload() async {
     setState(() {
-      _isLoading = true;
+      isLoading = true;
+      isCanPop = false;
     });
+
+    print('start downloadisLoading $isLoading');
 
     Dio dio = Dio();
-    await dio.download(widget.session.track, savePath);
 
-    widget.toggleParentFileExist();
+    try {
+      await dio.download(
+        widget.session.track,
+        widget.filePath,
+        onReceiveProgress: (received, total) {
+          if (total != -1) {
+            downloadProgress = received / total;
+            setState(() {});
+          }
+        },
+      );
+    } catch (e) {
+      print('Произошла ошибка при загрузке файла: $e');
+    }
+
     setState(() {
-      _isLoading = false;
+      isLoading = false;
+      isCanPop = true;
     });
 
+    print('goToBack');
     goToBack();
+    print('stop downloadisLoading $isLoading');
   }
 
-  goToBack() {
-    Navigator.of(context).pop();
-  }
-
-  Future<String> getPath() async {
-    Directory appDocDir = await getApplicationDocumentsDirectory();
+  void toggleNotVisible() async {
+    isNotVisible = !isNotVisible;
+    var box = await HiveBoxVisible().getBox();
+    await box.put('isNotVisible', isNotVisible);
     setState(() {});
-    return '${appDocDir.path}/${widget.fileName}';
   }
 
-  void initializeDownload() async {
-    String path = await getPath(); // /path/name.ext
-    downloadFile(path);
+  void checkIsNotVisible() async {
+    var box = await HiveBoxVisible().getBox();
+    var isNotVisibleFromBox = box.get('isNotVisible', defaultValue: false);
+    if (isNotVisibleFromBox) {
+      setState(() {
+        isLoading = true;
+        print('Запускаем процесс скачивания');
+        initDownload();
+      });
+    }
+  }
+
+  @override
+  void initState() {
+    super.initState();
+    checkIsNotVisible();
   }
 
   @override
   Widget build(BuildContext context) {
-    return AlertDialog(
-      contentPadding: const EdgeInsets.all(16),
-      insetPadding: const EdgeInsets.all(10),
-      title: Row(
-        children: [
-          SizedBox(
-            width: 60,
-            child: Image.asset(
-              'assets/images/__${widget.session.type}__.png',
-            ),
-          ),
-          const SizedBox(width: 8),
-          Expanded(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(widget.session.type, style: const TextStyle(fontFamily: FontFamily.semiFont, fontSize: 22)),
-                Text(widget.fileName, style: const TextStyle(fontFamily: FontFamily.semiFont, fontSize: 22)),
-              ],
-            ),
-          ),
-        ],
-      ),
-      content: Column(
-        mainAxisSize: MainAxisSize.min,
-        children: _isLoading
-            ? [
-                const Text('...Загрузка', style: TextStyle(fontFamily: FontFamily.semiFont, fontSize: 22)),
-                const SizedBox(height: 20),
-                const CircularProgressIndicator(),
-                const SizedBox(height: 20),
-                const Text(
-                  'Подождите, пока файл сохранится \nна Ваше устройство',
-                  style: TextStyle(fontFamily: FontFamily.semiFont, fontSize: 20),
-                  textAlign: TextAlign.center,
-                ),
-              ]
-            : [
-                const Text(
-                  'Вы можете скачать файл на устройство, для дальнейшего использования \nв отсутствии интернета',
-                  style: TextStyle(fontFamily: FontFamily.regularFont, fontSize: 18),
-                ),
-                Row(mainAxisAlignment: MainAxisAlignment.start, children: [
-                  Checkbox(
-                    value: _hideDialog,
-                    onChanged: (value) {
-                      setState(() {
-                        _hideDialog = value ?? false;
-                      });
-                    },
-                  ),
-                  const Text(
-                    'Больше не показывать',
-                    style: TextStyle(
-                      fontFamily: FontFamily.regularFont,
-                      fontSize: 16,
+    return PopScope(
+      canPop: isCanPop,
+      child: AlertDialog(
+        contentPadding: const EdgeInsets.all(16),
+        insetPadding: const EdgeInsets.all(10),
+        title: Row(
+          children: isLoading
+              ? const []
+              : [
+                  SizedBox(
+                    width: 60,
+                    child: Image.asset(
+                      'assets/images/__${widget.session.type}__.png',
                     ),
                   ),
-                ]),
-              ],
+                  const SizedBox(width: 8),
+                  Expanded(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          widget.session.type,
+                          style: const TextStyle(
+                            fontFamily: FontFamily.semiFont,
+                            fontSize: 22,
+                          ),
+                        ),
+                        Text(
+                          context.watch<FileApi>().getFileNameExtension(widget.session.track),
+                          style: const TextStyle(
+                            fontFamily: FontFamily.semiFont,
+                            fontSize: 22,
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                ],
+        ),
+        content: Builder(builder: (context) {
+          double width = MediaQuery.of(context).size.width;
+          return SizedBox(
+            width: width - 70,
+            child: isLoading
+                ? YPreloader(downloadProgress: downloadProgress)
+                : Column(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      const Text(
+                        'Вы можете скачать файл на устройство, для дальнейшего использования \n'
+                        'в отсутствии интернета',
+                        style: TextStyle(fontFamily: FontFamily.regularFont, fontSize: 18),
+                      ),
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.start,
+                        children: [
+                          Checkbox(
+                            value: isNotVisible,
+                            onChanged: (value) async {
+                              toggleNotVisible();
+                            },
+                          ),
+                          TextButton(
+                            onPressed: () {
+                              toggleNotVisible();
+                            },
+                            child: const Text(
+                              'Больше не показывать',
+                              style: TextStyle(
+                                fontFamily: FontFamily.regularFont,
+                                fontSize: 16,
+                              ),
+                            ),
+                          )
+                        ],
+                      ),
+                    ],
+                  ),
+          );
+        }),
+        actions: isLoading ? const [] : buttons(),
       ),
-      actions: _isLoading
-          ? []
-          : [
-              ElevatedButton(
-                onPressed: () {
-                  initializeDownload();
-                },
-                child: const Text(
-                  "Сохранить",
-                  style: TextStyle(
-                    fontFamily: FontFamily.regularFont,
-                    fontSize: 22,
+    );
+  }
+
+  List<Widget> buttons() {
+    return [
+      ElevatedButton(
+        onPressed: () {
+          initDownload();
+        },
+        child: const Text(
+          "Сохранить",
+          style: TextStyle(
+            fontFamily: FontFamily.regularFont,
+            fontSize: 22,
+          ),
+        ),
+      ),
+      ElevatedButton(
+        onPressed: () {
+          Navigator.of(context).pop();
+        },
+        child: const Text(
+          "Отмена",
+          style: TextStyle(
+            fontFamily: FontFamily.regularFont,
+            fontSize: 22,
+          ),
+        ),
+      ),
+    ];
+  }
+}
+
+class YPreloader extends StatelessWidget {
+  final double downloadProgress;
+
+  const YPreloader({
+    Key? key,
+    required this.downloadProgress,
+  }) : super(key: key);
+
+  @override
+  Widget build(BuildContext context) {
+    return Column(
+      mainAxisSize: MainAxisSize.min,
+      crossAxisAlignment: CrossAxisAlignment.center,
+      children: [
+        const Text(
+          'Идёт загрузка файла\n'
+          'Не выключайте телефон\n'
+          'и не выходите из приложения.',
+          style: TextStyle(fontFamily: FontFamily.semiFont, fontSize: 20),
+          textAlign: TextAlign.center,
+        ),
+        const SizedBox(height: 30),
+        Expanded(
+          flex: 0,
+          child: Stack(
+            children: [
+              Align(
+                child: SizedBox(
+                  width: 90.0,
+                  height: 90.0,
+                  child: CircularProgressIndicator(
+                    color: AppColors.btnColor,
+                    backgroundColor: AppColors.prloaderColor,
+                    strokeWidth: 20,
+                    value: downloadProgress,
+                    strokeCap: StrokeCap.round,
                   ),
                 ),
               ),
-              ElevatedButton(
-                onPressed: () {
-                  Navigator.of(context).pop();
-                },
-                child: const Text(
-                  "Отмена",
-                  style: TextStyle(
-                    fontFamily: FontFamily.regularFont,
-                    fontSize: 22,
+              Positioned(
+                left: 0.5,
+                right: 0.5,
+                bottom: 30,
+                child: Center(
+                  child: Column(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    crossAxisAlignment: CrossAxisAlignment.center,
+                    children: [
+                      Text(
+                        '${(downloadProgress * 100).toStringAsFixed(0)}%',
+                        style: const TextStyle(fontSize: 26, fontFamily: FontFamily.semiFont),
+                      ),
+                    ],
                   ),
                 ),
               ),
             ],
+          ),
+        ),
+      ],
     );
   }
 }
