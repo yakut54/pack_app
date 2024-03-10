@@ -26,7 +26,7 @@ class _TextDescriptionWidgetState extends State<TextDescriptionWidget> {
       data: widget.session.description,
       style: {
         'html': Style(
-          fontSize: FontSize(20.0),
+          fontSize: FontSize(19.0),
           color: Colors.black,
           fontFamily: FontFamily.regularFont,
         ),
@@ -45,7 +45,7 @@ class _TextDescriptionWidgetState extends State<TextDescriptionWidget> {
       data: recomendation,
       style: {
         'html': Style(
-          fontSize: FontSize(20.0),
+          fontSize: FontSize(19.0),
           color: Colors.black,
           fontFamily: FontFamily.regularFont,
         ),

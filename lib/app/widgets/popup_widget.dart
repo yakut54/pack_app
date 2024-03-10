@@ -18,7 +18,6 @@ class PopupDialog extends StatefulWidget {
 }
 
 class PopupDialogState extends State<PopupDialog> {
-  bool isCanPop = true;
   bool isLoading = false;
   bool isNotVisible = false;
   double downloadProgress = 0;
@@ -28,7 +27,6 @@ class PopupDialogState extends State<PopupDialog> {
   Future<void> initDownload() async {
     setState(() {
       isLoading = true;
-      isCanPop = false;
     });
 
     print('start downloadisLoading $isLoading');
@@ -52,7 +50,6 @@ class PopupDialogState extends State<PopupDialog> {
 
     setState(() {
       isLoading = false;
-      isCanPop = true;
     });
 
     print('goToBack');
@@ -88,7 +85,7 @@ class PopupDialogState extends State<PopupDialog> {
   @override
   Widget build(BuildContext context) {
     return PopScope(
-      canPop: isCanPop,
+      canPop: !isLoading,
       child: AlertDialog(
         contentPadding: const EdgeInsets.all(16),
         insetPadding: const EdgeInsets.all(10),
@@ -136,7 +133,8 @@ class PopupDialogState extends State<PopupDialog> {
                     mainAxisSize: MainAxisSize.min,
                     children: [
                       const Text(
-                        'Вы можете скачать файл на устройство, для дальнейшего использования \n'
+                        'Вы можете скачать файл на устройство, \n'
+                        'для дальнейшего использования \n'
                         'в отсутствии интернета',
                         style: TextStyle(fontFamily: FontFamily.regularFont, fontSize: 18),
                       ),
@@ -234,10 +232,10 @@ class YPreloader extends StatelessWidget {
                   height: 90.0,
                   child: CircularProgressIndicator(
                     color: AppColors.btnColor,
-                    backgroundColor: AppColors.prloaderColor,
-                    strokeWidth: 20,
+                    backgroundColor: AppColors.headerTitleColor,
+                    strokeWidth: 15,
                     value: downloadProgress,
-                    strokeCap: StrokeCap.round,
+                    strokeCap: StrokeCap.butt,
                   ),
                 ),
               ),

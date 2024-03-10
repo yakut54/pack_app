@@ -42,8 +42,6 @@ class _MenuState extends State<Menu> {
     } else {
       _packBloc.add(LoadPack());
     }
-
-    // _packBloc.add(LoadPack());
   }
 
   @override

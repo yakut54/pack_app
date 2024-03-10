@@ -3,7 +3,6 @@ import 'dart:io';
 
 import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
-import 'package:pack_app/app/widgets/button.dart';
 import '/app/imports/all_imports.dart';
 
 class Description extends StatefulWidget {
@@ -80,6 +79,8 @@ class _DescriptionState extends State<Description> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      floatingActionButton: const FloatingBackButton(),
+      floatingActionButtonLocation: FloatingActionButtonLocation.miniEndFloat,
       body: SafeArea(
         bottom: false,
         child: SingleChildScrollView(
@@ -137,16 +138,6 @@ class _DescriptionState extends State<Description> {
           ),
         ),
       ),
-      floatingActionButton: FloatingActionButton(
-        backgroundColor: AppColors.backButtonColor,
-        onPressed: () => Navigator.pop(context),
-        child: const Icon(
-          color: AppColors.headerTitleColor,
-          size: 50,
-          Icons.keyboard_arrow_left,
-        ),
-      ),
-      floatingActionButtonLocation: FloatingActionButtonLocation.miniEndFloat,
     );
   }
 

@@ -14,5 +14,5 @@ class AppColors {
   static const playerColor = Color.fromARGB(132, 137, 244, 248);
   static const prloaderColor = Color.fromARGB(132, 15, 166, 172);
   static const headerTitleColor = Color(0xFFC09D52);
-  static const backButtonColor = Color.fromARGB(255, 82, 78, 78);
+  static const backButtonColor = Color(0xFF535357);
 }

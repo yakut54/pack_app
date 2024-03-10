@@ -72,15 +72,7 @@ class _VideoScreenState extends State<VideoScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      floatingActionButton: FloatingActionButton(
-        backgroundColor: AppColors.backButtonColor,
-        onPressed: () => Navigator.pop(context),
-        child: const Icon(
-          color: AppColors.headerTitleColor,
-          size: 50,
-          Icons.keyboard_arrow_left,
-        ),
-      ),
+      floatingActionButton: const FloatingBackButton(),
       floatingActionButtonLocation: FloatingActionButtonLocation.endFloat,
       body: SafeArea(
         bottom: false,
