@@ -24,7 +24,7 @@ if (flutterVersionName == null) {
 
 android {
     namespace "com.example.pack_app"
-    compileSdkVersion flutter.compileSdkVersion
+    compileSdkVersion 34
     ndkVersion flutter.ndkVersion
 
     compileOptions {
@@ -54,11 +54,33 @@ android {
 
     buildTypes {
         release {
-            // TODO: Add your own signing config for the release build.
-            // Signing with the debug keys for now, so `flutter run --release` works.
             signingConfig signingConfigs.debug
         }
     }
+
+    flavorDimensions "version"
+
+    productFlavors { 
+        yabloko {
+            dimension "version"
+            applicationId "com.example.yabloko"
+            versionCode 1
+            versionName "1.0"
+            android.applicationVariants.all { variant ->
+                variant.outputs.all {
+                    def variantNameWithoutType = variant.name.replace("Debug", "").replace("Release", "").replace("Profile", "")
+                    outputFileName = "pack-${variantNameWithoutType}.apk"
+                }
+            }
+        }
+        dev {
+            dimension "version"
+            applicationId "com.example.dev"
+            versionCode 1
+            versionName "1.0"
+        }
+    }
+
 }
 
 flutter {

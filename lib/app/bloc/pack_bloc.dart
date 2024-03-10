@@ -1,7 +1,7 @@
 import 'package:equatable/equatable.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
-import '/app/router/export.dart';
+import '/app/imports/all_imports.dart';
 
 part 'pack_event.dart';
 part 'pack_state.dart';
