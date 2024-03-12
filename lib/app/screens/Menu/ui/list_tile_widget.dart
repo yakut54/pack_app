@@ -18,6 +18,23 @@ class ListTileWidget extends StatelessWidget {
     subtitle = session.subtitle.trim().replaceAll("\\n", "\n");
     type = session.type;
   }
+  Route _createRoute() {
+    return PageRouteBuilder(
+      pageBuilder: (context, animation, secondaryAnimation) => Description(session: session),
+      transitionsBuilder: (context, animation, secondaryAnimation, child) {
+        var begin = Offset(1.0, 0.4);
+        var end = Offset.zero;
+        var curve = Curves.ease;
+
+        var tween = Tween(begin: begin, end: end).chain(CurveTween(curve: curve));
+
+        return SlideTransition(
+          position: animation.drive(tween),
+          child: child,
+        );
+      },
+    );
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -49,10 +66,11 @@ class ListTileWidget extends StatelessWidget {
           responsiveSizes: responsiveSizes,
         ),
         onTap: () {
-          Navigator.push(
-            context,
-            MaterialPageRoute(builder: (context) => Description(session: session)),
-          );
+          // Navigator.push(
+          //   context,
+          //   MaterialPageRoute(builder: (context) => Description(session: session)),
+          // );
+          Navigator.of(context).push(_createRoute());
         },
       ),
     );

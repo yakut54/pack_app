@@ -76,6 +76,24 @@ class _DescriptionState extends State<Description> {
     setState(() {});
   }
 
+  Route _createRoute() {
+    return PageRouteBuilder(
+      pageBuilder: (context, animation, secondaryAnimation) => _controllerRouteWidget(),
+      transitionsBuilder: (context, animation, secondaryAnimation, child) {
+        var begin = Offset(1.0, 0.4);
+        var end = Offset.zero;
+        var curve = Curves.ease;
+
+        var tween = Tween(begin: begin, end: end).chain(CurveTween(curve: curve));
+
+        return SlideTransition(
+          position: animation.drive(tween),
+          child: child,
+        );
+      },
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -120,10 +138,11 @@ class _DescriptionState extends State<Description> {
                         YButton(
                           title: 'НАЧАТЬ',
                           onTap: () {
-                            Navigator.push(
-                              context,
-                              MaterialPageRoute(builder: (context) => _controllerRouteWidget()),
-                            );
+                            // Navigator.push(
+                            //   context,
+                            //   MaterialPageRoute(builder: (context) => _controllerRouteWidget()),
+                            // );
+                            Navigator.of(context).push(_createRoute());
                           },
                         ),
                         const SizedBox(height: 15),

@@ -49,7 +49,7 @@ class _MenuState extends State<Menu> {
     super.didChangeDependencies();
 
     if (!isStarted) {
-      Timer(const Duration(seconds: 5), () {
+      Timer(const Duration(seconds: 2), () {
         isStarted = true;
         setState(() {});
       });
@@ -101,22 +101,10 @@ class _MenuState extends State<Menu> {
                                       maxWidth: 800,
                                       minHeight: 80,
                                     ),
-                                    // alignment: Alignment.center,
-                                    // decoration: BoxDecoration(
-                                    //     // color: const Color(0xFFF1F3FF),
-                                    //     // boxShadow: [
-                                    //     //   BoxShadow(
-                                    //     //     color: Colors.black.withOpacity(0.47),
-                                    //     //     blurRadius: 2,
-                                    //     //     offset: const Offset(2, 2),
-                                    //     //   ),
-                                    //     // ],
-                                    //     ),
                                     child: ListTileWidget(
                                       width: width,
                                       // sessions: state.pack.sessions[index],
                                       session: pack!.sessions[index],
-                                      // index: index,
                                     ),
                                   ),
                                 ),
