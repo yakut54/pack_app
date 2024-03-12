@@ -10,9 +10,15 @@ class App extends StatelessWidget {
       debugShowCheckedModeBanner: false,
       title: 'Packs 2.0',
       theme: ThemeData(
+        listTileTheme: ListTileThemeData(
+          tileColor: AppColors.mainColor,
+          selectedTileColor: Colors.blue,
+          contentPadding: EdgeInsets.all(10), // Add some padding around the tile
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(10),
+          ),
+        ),
         scaffoldBackgroundColor: AppColors.mediumColor,
-        colorScheme: ColorScheme.fromSeed(seedColor: AppColors.mainColor),
-        useMaterial3: true,
       ),
       home: const Menu(),
     );

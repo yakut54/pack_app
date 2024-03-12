@@ -2,9 +2,8 @@ import 'package:flutter/material.dart';
 import '/app/imports/all_imports.dart';
 
 class ListTileWidget extends StatelessWidget {
-  final int index;
   final double width;
-  final List<Session> sessions;
+  final Session session;
 
   late final String title;
   late final String subtitle;
@@ -12,44 +11,50 @@ class ListTileWidget extends StatelessWidget {
 
   ListTileWidget({
     super.key,
-    required this.sessions,
+    required this.session,
     required this.width,
-    required this.index,
   }) {
-    title = sessions[index].title.trim().replaceAll("\\n", "\n");
-    subtitle = sessions[index].subtitle.trim().replaceAll("\\n", "\n");
-    type = sessions[index].type;
+    title = session.title.trim().replaceAll("\\n", "\n");
+    subtitle = session.subtitle.trim().replaceAll("\\n", "\n");
+    type = session.type;
   }
 
   @override
   Widget build(BuildContext context) {
     BaseResponsiveSizing responsiveSizes = BaseResponsiveSizing(width);
 
-    return ListTile(
-      contentPadding: const EdgeInsets.symmetric(vertical: 4, horizontal: 6),
-      leading: SizedBox(
-        width: 50,
-        child: Image.asset(
-          'assets/images/__${type}__.png',
-          width: 50.0,
-          height: 50.0,
-          fit: BoxFit.cover,
+    return Card(
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.circular(10),
+      ),
+      elevation: 4,
+      shadowColor: const Color.fromARGB(255, 153, 153, 153),
+      child: ListTile(
+        contentPadding: const EdgeInsets.symmetric(vertical: 4, horizontal: 6),
+        leading: SizedBox(
+          width: 50,
+          child: Image.asset(
+            'assets/images/__${type}__.png',
+            width: 50.0,
+            height: 50.0,
+            fit: BoxFit.cover,
+          ),
         ),
+        title: _TitleWidget(
+          title: title,
+          responsiveSizes: responsiveSizes,
+        ),
+        subtitle: _SubtitleWidget(
+          subtitle: subtitle,
+          responsiveSizes: responsiveSizes,
+        ),
+        onTap: () {
+          Navigator.push(
+            context,
+            MaterialPageRoute(builder: (context) => Description(session: session)),
+          );
+        },
       ),
-      title: _TitleWidget(
-        title: title,
-        responsiveSizes: responsiveSizes,
-      ),
-      subtitle: _SubtitleWidget(
-        subtitle: subtitle,
-        responsiveSizes: responsiveSizes,
-      ),
-      onTap: () {
-        Navigator.push(
-          context,
-          MaterialPageRoute(builder: (context) => Description(session: sessions[index])),
-        );
-      },
     );
   }
 }

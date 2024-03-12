@@ -10,6 +10,7 @@ class FloatingBackButton extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return FloatingActionButton(
+      // foregroundColor: AppColors.btnColor,
       mini: true,
       shape: const CircleBorder(
         side: BorderSide(color: AppColors.headerTitleColor, strokeAlign: -4),

@@ -91,7 +91,7 @@ class _MenuState extends State<Menu> {
                               return Padding(
                                 padding: const EdgeInsets.symmetric(
                                   horizontal: 5,
-                                  vertical: 3,
+                                  vertical: 0,
                                 ),
                                 child: Container(
                                   alignment: Alignment.center,
@@ -101,22 +101,22 @@ class _MenuState extends State<Menu> {
                                       maxWidth: 800,
                                       minHeight: 80,
                                     ),
-                                    alignment: Alignment.center,
-                                    decoration: BoxDecoration(
-                                      color: const Color(0xFFF1F3FF),
-                                      boxShadow: [
-                                        BoxShadow(
-                                          color: Colors.black.withOpacity(0.47),
-                                          blurRadius: 2,
-                                          offset: const Offset(2, 2),
-                                        ),
-                                      ],
-                                    ),
+                                    // alignment: Alignment.center,
+                                    // decoration: BoxDecoration(
+                                    //     // color: const Color(0xFFF1F3FF),
+                                    //     // boxShadow: [
+                                    //     //   BoxShadow(
+                                    //     //     color: Colors.black.withOpacity(0.47),
+                                    //     //     blurRadius: 2,
+                                    //     //     offset: const Offset(2, 2),
+                                    //     //   ),
+                                    //     // ],
+                                    //     ),
                                     child: ListTileWidget(
                                       width: width,
-                                      // sessions: state.pack.sessions,
-                                      sessions: pack!.sessions,
-                                      index: index,
+                                      // sessions: state.pack.sessions[index],
+                                      session: pack!.sessions[index],
+                                      // index: index,
                                     ),
                                   ),
                                 ),
